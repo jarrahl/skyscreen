@@ -12,6 +12,7 @@ For the receiver, it's more or less the same, but the 'flush' method has two par
 The current implementation uses a memory mapped file that we can share between writer and reader, and a semaphore to implement flush, but I'll be abstracting out the flush synchronization mechanism for testability (at some point).
 
 In the future I'd like to implement:
+
 1. Mode flags, so we can have the option to buffer some screens or to change interlacing
 2. A UDP based synchronization protocol so that we can easily write over network links.
 3. A way to compose transforms of the byte-array, which might be a good way to implement interlacing and such.
