@@ -22,10 +22,18 @@ class Screen(object):
 	|xxxx BLUE CHANNEL, AT 360 degrees xxx| |
 	+-------------------------------------+ V
 	"""
-	screen_vane_length = 144 * 2 * 3
+	screen_vane_length = 144 * 2
 	screen_vane_count = 360
 	array_size = screen_vane_count * screen_vane_length * 3
 
+chanmap = {
+	'r': 0,
+	'g': 1,
+	'b': 2
+}
+
+def pixel_vane_mapping(vane, pixel, channel):
+	return vane * Screen.screen_vane_length * 3 + Screen.screen_vane_length * chanmap[channel] + pixel
 
 class ScreenBuffer(object):
 	"""An abstract screen buffer"""

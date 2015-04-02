@@ -25,11 +25,14 @@ class MMAPScreenWriter(BaseMMapInterface, skyscreen.interface.ScreenWriter):
 	def __init__(self, shared_file):
 		super(MMAPScreenWriter, self).__init__(shared_file)
 
-	def __enter__(self):
-		assert self.shared_memory is None, 'cannot open shared mem twice'
+	def initialize_file(self):
 		self.shared_handle = os.open(self.shared_file, self.file_mode)
 		assert self.shared_handle, 'could not open: %s' % self.shared_file
 		assert os.write(self.shared_handle, '\x00' * self.array_size) == self.array_size
+
+	def __enter__(self):
+		assert self.shared_memory is None, 'cannot open shared mem twice'
+		self.initialize_file()
 		self.shared_memory = mmap.mmap(self.shared_handle, self.array_size, mmap.MAP_SHARED, mmap.PROT_WRITE)
 		return self.shared_memory
 
