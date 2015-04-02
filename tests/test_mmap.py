@@ -38,5 +38,5 @@ def test_send_data():
 			c = str(unichr(random.randint(0, 127)))
 			writer[offset] = c
 			assert reader[offset] == c
-# FIXME: the trick with testing the sync stuff is to write a class that deals with
-# sync. Then mock that class, with a queue that lets me sneak in other clients and stuff.
+
+

@@ -1,11 +1,30 @@
-import mmap_interface
-import os
-import threading
+import logging
 
 
 class Screen(object):
-	screen_vane_length = 144 * 2
+	"""
+	The format for the screen_vane buffer is
+    <--------- screen_vane_length ------->
+	 CENTER ......................... EDGE
+	+-------------------------------------+ ^
+	|xxxxx RED CHANNEL, AT 0 degrees xxxxx| |
+	|xxx GREEN CHANNEL, AT 0 degrees xxxxx| |
+	|xxxxx BLUE CHANNEL, AT 0 degrees xxxx| |
+	|xxxxx RED CHANNEL, AT 1 degrees xxxxx| |
+	|xxx GREEN CHANNEL, AT 1 degrees xxxxx| |
+	|xxxxx BLUE CHANNEL, AT 1 degrees xxxx| | screen_vane_count * 3
+	|xxxxx RED CHANNEL, AT 2 degrees xxxxx| |
+	|xxx GREEN CHANNEL, AT 2 degrees xxxxx| |
+	|xxxxx BLUE CHANNEL, AT 2 degrees xxxx| |
+	........AND SO ON IN THAT MANNER....... |
+	|xxxx RED CHANNEL, AT 360 degrees xxxx| |
+	|xx GREEN CHANNEL, AT 360 degrees xxxx| |
+	|xxxx BLUE CHANNEL, AT 360 degrees xxx| |
+	+-------------------------------------+ V
+	"""
+	screen_vane_length = 144 * 2 * 3
 	screen_vane_count = 360
+	array_size = screen_vane_count * screen_vane_length * 3
 
 
 class ScreenBuffer(object):
@@ -29,8 +48,6 @@ class ScreenWriter(Screen):
 	def __exit__(self, type, value, traceback):
 		raise NotImplementedError()
 
-	def flush(self):
-		raise NotImplementedError()
 
 class ScreenReader(Screen):
 	def __enter__(self):
@@ -42,15 +59,25 @@ class ScreenReader(Screen):
 	def __exit__(self, type, value, traceback):
 		raise NotImplementedError()
 
-	def read(self):
-		raise NotImplementedError()
-
-	def doneread(self):
-		raise NotImplementedError()
-
 class WriterSync(object):
-	def acquire(self):
-		pass
+	def frame_ready(self):
+		raise NotImplementedError()
 
-	def release(self):
-		pass
+
+class ReaderSync(object):
+	def start_read(self):
+		raise NotImplementedError()
+	def finish_read(self):
+		raise NotImplementedError()
+
+
+class DummyWriterSync(WriterSync):
+	def frame_ready(self):
+		logging.warning('A dummy writer sync is being used, frame_ready calls do nothing')
+
+class DummyReaderSync(WriterSync):
+	def start_read(self):
+		logging.warning('A dummy reader is being used, start_read calls do nothing')
+	def finish_read(self):
+		logging.warning('A dummy reader is being used, finish_read calls do nothing')
+
