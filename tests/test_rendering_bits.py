@@ -35,20 +35,50 @@ def test_position_overflows():
 				assert position < Screen.array_size, '%d was out of range %d (%d, %d, %s)' % \
 													 (position, Screen.array_size, vane, pixel, channel)
 
-
-def test_noise():
+def render(generate_callback):
 	filename = tempfile.mktemp("")
 	writer = skyscreen.mmap_interface.MMAPScreenWriter(filename)
+	writer.initialize_file()
 	reader = skyscreen.mmap_interface.MMAPScreenReader(filename)
 	sync = skyscreen.interface.DummyReaderSync()
 
-	def write_random():
-		with writer as writer_buf:
-			for offset in range(len(writer_buf)):
-				c = str(unichr(random.randint(0, 127)))
-				writer_buf[offset] = c
+	callback = generate_callback(writer)
 
-	write_random()
+	def inner():
+		with writer as writer_buf:
+			for vane in range(Screen.screen_vane_count):
+				r = str(unichr(((vane % 3) == 0) * 127))
+				g = str(unichr(((vane % 3 - 1) == 0) * 127))
+				b = str(unichr(((vane % 3 - 2) == 0) * 127))
+				for pixel in range(Screen.screen_vane_length):
+					writer_buf[rendering.pixel_vane_mapping(vane, pixel, 'r')] = r
+					writer_buf[rendering.pixel_vane_mapping(vane, pixel, 'g')] = g
+					writer_buf[rendering.pixel_vane_mapping(vane, pixel, 'b')] = b
 
 	with reader as reader_buf:
-		rendering.render_main(reader_buf, sync, max_loops=5, callback=write_random)
+		rendering.render_main(reader_buf, sync, max_loops=5, callback=callback)
+def test_noise():
+	def generate_write_random(writer):
+		def inner():
+			with writer as writer_buf:
+				for offset in range(len(writer_buf)):
+					c = str(unichr(random.randint(0, 127)))
+					writer_buf[offset] = c
+		return inner
+	render(generate_write_random)
+
+def test_stripes():
+	def generate_write_random_stripes(writer):
+		def inner():
+			with writer as writer_buf:
+				for vane in range(Screen.screen_vane_count):
+					r = str(unichr(((vane % 3) == 0) * 127))
+					g = str(unichr(((vane % 3 - 1) == 0) * 127))
+					b = str(unichr(((vane % 3 - 2) == 0) * 127))
+					for pixel in range(Screen.screen_vane_length):
+						writer_buf[rendering.pixel_vane_mapping(vane, pixel, 'r')] = r
+						writer_buf[rendering.pixel_vane_mapping(vane, pixel, 'g')] = g
+						writer_buf[rendering.pixel_vane_mapping(vane, pixel, 'b')] = b
+		return inner
+
+	render(generate_write_random_stripes)

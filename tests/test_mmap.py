@@ -40,5 +40,6 @@ def test_send_data():
 			assert reader[offset] == c
 
 
-def test_forked_write():
-	subprocess.check_call("python tests/forked_write_test.py", shell=True)
+def _test_forked_write():
+	assert False
+	subprocess.check_call("python tests/forked_write.py", shell=True)
