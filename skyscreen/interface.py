@@ -2,26 +2,6 @@ import logging
 
 
 class Screen(object):
-	"""
-	The format for the screen_vane buffer is
-    <--------- screen_vane_length ------->
-	 CENTER ......................... EDGE
-	+-------------------------------------+ ^
-	|xxxxx RED CHANNEL, AT 0 degrees xxxxx| |
-	|xxx GREEN CHANNEL, AT 0 degrees xxxxx| |
-	|xxxxx BLUE CHANNEL, AT 0 degrees xxxx| |
-	|xxxxx RED CHANNEL, AT 1 degrees xxxxx| |
-	|xxx GREEN CHANNEL, AT 1 degrees xxxxx| |
-	|xxxxx BLUE CHANNEL, AT 1 degrees xxxx| | screen_vane_count * 3
-	|xxxxx RED CHANNEL, AT 2 degrees xxxxx| |
-	|xxx GREEN CHANNEL, AT 2 degrees xxxxx| |
-	|xxxxx BLUE CHANNEL, AT 2 degrees xxxx| |
-	........AND SO ON IN THAT MANNER....... |
-	|xxxx RED CHANNEL, AT 360 degrees xxxx| |
-	|xx GREEN CHANNEL, AT 360 degrees xxxx| |
-	|xxxx BLUE CHANNEL, AT 360 degrees xxx| |
-	+-------------------------------------+ V
-	"""
 	screen_vane_length = 144 * 2
 	screen_vane_count = 360
 	array_size = screen_vane_count * screen_vane_length * 3
@@ -33,7 +13,7 @@ chanmap = {
 }
 
 def pixel_vane_mapping(vane, pixel, channel):
-	return vane * Screen.screen_vane_length * 3 + Screen.screen_vane_length * chanmap[channel] + pixel
+	return (vane * Screen.screen_vane_length * 3) + pixel * 3 + chanmap[channel]
 
 class ScreenBuffer(object):
 	"""An abstract screen buffer"""

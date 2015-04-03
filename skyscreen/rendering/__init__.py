@@ -24,7 +24,7 @@ def polar_coordinate_transform(theta, radius):
 	y = center + radius * math.sin(theta)
 	return x, y
 
-def render_buffer(screen, reader_buf):
+def render_buffer(surf, reader_buf):
 	for vane in xrange(Screen.screen_vane_count):
 		theta = calculate_theta(vane)
 		for pixel in xrange(Screen.screen_vane_length):
@@ -34,7 +34,12 @@ def render_buffer(screen, reader_buf):
 			g = ord(reader_buf[pixel_vane_mapping(vane, pixel, 'g')])
 			b = ord(reader_buf[pixel_vane_mapping(vane, pixel, 'b')])
 
-			pygame.draw.ellipse(screen, (r, g, b), [x, y, 10, 10], 5)
+			# pygame.draw.ellipse(screen, (r, g, b), [x, y, 6, 6], 3)
+			surf[x][y] = [r, g, b]
+			surf[x+1][y] = [r, g, b]
+			surf[x-1][y] = [r, g, b]
+			surf[x][y+1] = [r, g, b]
+			surf[x][y-1] = [r, g, b]
 
 
 def render_main(reader_buf, reader_sync, max_loops=None, callback=None):
@@ -52,8 +57,8 @@ def render_main(reader_buf, reader_sync, max_loops=None, callback=None):
 				done = True
 		screen.fill(BLACK)
 		reader_sync.start_read()
-
-		render_buffer(screen, reader_buf)
+		surf = pygame.surfarray.pixels3d(screen)
+		render_buffer(surf, reader_buf)
 
 		reader_sync.finish_read()
 		pygame.display.flip()
