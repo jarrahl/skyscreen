@@ -1,7 +1,7 @@
 import random
-import string
 import tempfile
-import threading
+import subprocess
+
 import skyscreen.mmap_interface
 
 
@@ -40,3 +40,5 @@ def test_send_data():
 			assert reader[offset] == c
 
 
+def test_forked_write():
+	subprocess.check_call("python tests/forked_write_test.py", shell=True)

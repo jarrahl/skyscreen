@@ -6,7 +6,8 @@ from skyscreen.interface import Screen, pixel_vane_mapping
 import skyscreen.mmap_interface
 
 try:
-	shared_file = os.environ['WRITER_FILE']
+	# shared_file = os.environ['WRITER_FILE']
+	shared_file = 'foo'
 except KeyError:
 	print 'You must pass the shared file as WRITER_FILE env variable'
 	sys.exit(1)

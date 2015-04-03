@@ -20,7 +20,7 @@ class BaseMMapInterface(object):
 
 
 class MMAPScreenWriter(BaseMMapInterface, skyscreen.interface.ScreenWriter):
-	file_mode = os.O_CREAT | os.O_TRUNC | os.O_RDWR
+	file_mode = os.O_CREAT | os.O_RDWR
 
 	def __init__(self, shared_file):
 		super(MMAPScreenWriter, self).__init__(shared_file)
@@ -43,7 +43,6 @@ class MMAPScreenReader(BaseMMapInterface, skyscreen.interface.ScreenReader):
 		super(MMAPScreenReader, self).__init__(shared_file)
 
 	def __enter__(self):
-
 		assert self.shared_memory is None, 'cannot open shared mem twice'
 		try:
 			self.shared_handle = os.open(self.shared_file, self.file_mode)

@@ -6,6 +6,7 @@ import skyscreen.mmap_interface
 from skyscreen.interface import Screen, WriterSync, ReaderSync, pixel_vane_mapping
 import skyscreen.rendering as rendering
 
+
 def test_theta_calc():
 	degrees = [rendering.calculate_theta(degree) for degree in xrange(Screen.screen_vane_count)]
 	assert sorted(degrees) == degrees
@@ -13,6 +14,7 @@ def test_theta_calc():
 	assert 2 * math.pi * 0.99 <= max(degrees) <= 2 * math.pi
 	deltas = {a - b for a, b in zip(degrees, degrees[1:])}
 	assert max(deltas) - min(deltas) < 0.01
+
 
 def test_calculate_radius():
 	positions = [rendering.calculate_radius(pixel) for pixel in xrange(Screen.screen_vane_length)]
@@ -24,13 +26,15 @@ def test_calculate_radius():
 	deltas = {a - b for a, b in zip(positions, positions[1:])}
 	assert max(deltas) - min(deltas) < 0.01
 
+
 def test_position_overflows():
 	for vane in xrange(Screen.screen_vane_count):
 		for pixel in xrange(Screen.screen_vane_length):
 			for channel in {'r', 'g', 'b'}:
 				position = rendering.pixel_vane_mapping(vane, pixel, channel)
-				assert position < Screen.array_size, '%d was out of range %d (%d, %d, %s)' %\
+				assert position < Screen.array_size, '%d was out of range %d (%d, %d, %s)' % \
 													 (position, Screen.array_size, vane, pixel, channel)
+
 
 def test_noise():
 	filename = tempfile.mktemp("")
@@ -43,7 +47,8 @@ def test_noise():
 			for offset in range(len(writer_buf)):
 				c = str(unichr(random.randint(0, 127)))
 				writer_buf[offset] = c
+
 	write_random()
 
 	with reader as reader_buf:
-		rendering.render_main(reader_buf, sync, callback=write_random)
+		rendering.render_main(reader_buf, sync, max_loops=5, callback=write_random)

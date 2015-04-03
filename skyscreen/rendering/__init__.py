@@ -33,6 +33,7 @@ def render_buffer(screen, reader_buf):
 			r = ord(reader_buf[pixel_vane_mapping(vane, pixel, 'r')])
 			g = ord(reader_buf[pixel_vane_mapping(vane, pixel, 'g')])
 			b = ord(reader_buf[pixel_vane_mapping(vane, pixel, 'b')])
+
 			pygame.draw.ellipse(screen, (r, g, b), [x, y, 10, 10], 5)
 
 
