@@ -6,7 +6,7 @@ import subprocess
 import sys
 import traceback
 
-from skyscreen import mmap_interface, rendering, interface
+from skyscreen import rendering, interface, memmap_interface
 
 
 if __name__=='__main__':
@@ -16,10 +16,10 @@ if __name__=='__main__':
 
 	#file_name = tempfile.mktemp("")
 	file_name = 'foo'
-	writer = mmap_interface.MMAPScreenWriter(file_name)
+	writer = memmap_interface.NPMMAPScreenWriter(file_name)
 	writer.initialize_file()
 
-	reader = mmap_interface.MMAPScreenReader(file_name)
+	reader = memmap_interface.NPMMAPScreenReader(file_name)
 	reader_sync = interface.DummyReaderSync()
 
 

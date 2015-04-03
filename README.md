@@ -18,7 +18,21 @@ In the future I'd like to implement:
 3. A way to compose transforms of the byte-array, which might be a good way to implement interlacing and such.
 
 # TODO #
-The next thing to do is to write a display module so we can all start testing our patterns. Then to write a C receiver for speed. Note that if we managed the network sync protocol, we could get away from using linux on the reciever pie, and use a real time OS instead.
+ - Performance
+ - Performance
+ - Performance
+ 
+At the moment there's a _huge_ bottleneck in the shared array. I'm confident that the shared
+array can be fast enough to work, meaning that the OS is not the problem here. There are bottle-necks in
+the type-conversion from int to byte, which can be solved with a more intelligent cast, or by
+working only with c-types. Then there's a large bottleneck on the other side when reading the
+array and copying into the surface.
+
+I may try using the blit() method to apply the shared array straight onto the surface, assuming
+that it's all in the right order. 
+
+One option I'm hoping will work is that numpy will let me treat the mmapped array as a numpy 
+array. Then we'll be all good.
 
 # Installation #
 
@@ -49,3 +63,4 @@ an example screen:
     WRITER_FILE=foo python -m screens noise
     
 Once you're finished, just kill the processes.
+

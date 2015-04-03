@@ -5,6 +5,7 @@ import random
 import sys
 from skyscreen import rendering
 from skyscreen.interface import Screen, pixel_vane_mapping
+import skyscreen.memmap_interface
 import skyscreen.mmap_interface
 import argparse
 import numpy as np

@@ -5,7 +5,6 @@ import skyscreen.interface
 
 
 class BaseMMapInterface(object):
-
 	def __init__(self, shared_file):
 		self.shared_file = shared_file
 		self.shared_handle = None
@@ -56,7 +55,6 @@ class MMAPScreenReader(BaseMMapInterface, skyscreen.interface.ScreenReader):
 		assert self.shared_handle, 'could not open: %s' % self.shared_file
 		self.shared_memory = mmap.mmap(self.shared_handle, self.array_size, mmap.MAP_SHARED, mmap.PROT_READ)
 		return self.shared_memory
-
 
 class SemaphoreWriterSync(skyscreen.interface.WriterSync):
 	def __init__(self, sem):

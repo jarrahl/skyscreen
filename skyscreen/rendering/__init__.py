@@ -1,5 +1,10 @@
+import ctypes
 import pygame
+import numpy as np
 import math
+import pyximport
+pyximport.install()
+import renderops
 from skyscreen.interface import Screen, pixel_vane_mapping
 
 BLACK = (0, 0, 0)
@@ -7,39 +12,21 @@ window_size = 800
 annulus_offset = 50
 shrinkage_factor = 0.9
 
-
-def calculate_theta(vane):
-	return 2 * math.pi * float(vane) / Screen.screen_vane_count
-
-
-def calculate_radius(pixel):
-	pixel_proportion = float(pixel) / Screen.screen_vane_length
-	render_area_size = (window_size / 2 * shrinkage_factor) - annulus_offset
-	return annulus_offset + render_area_size * pixel_proportion
-
-
-def polar_coordinate_transform(theta, radius):
-	center = window_size / 2.0
-	x = center + radius * math.cos(theta)
-	y = center + radius * math.sin(theta)
-	return x, y
-
 def render_buffer(surf, reader_buf):
 	for vane in xrange(Screen.screen_vane_count):
-		theta = calculate_theta(vane)
+		theta = renderops.calculate_theta(vane)
 		for pixel in xrange(Screen.screen_vane_length):
-			radius = calculate_radius(pixel)
-			x, y = polar_coordinate_transform(theta, radius)
-			r = ord(reader_buf[pixel_vane_mapping(vane, pixel, 'r')])
-			g = ord(reader_buf[pixel_vane_mapping(vane, pixel, 'g')])
-			b = ord(reader_buf[pixel_vane_mapping(vane, pixel, 'b')])
+			radius = renderops.calculate_radius(pixel)
+			x, y = renderops.polar_coordinate_transform(theta, radius)
+			r = reader_buf[pixel_vane_mapping(vane, pixel, 'r')]
+			g = reader_buf[pixel_vane_mapping(vane, pixel, 'g')]
+			b = reader_buf[pixel_vane_mapping(vane, pixel, 'b')]
 
-			# pygame.draw.ellipse(screen, (r, g, b), [x, y, 6, 6], 3)
 			surf[x][y] = [r, g, b]
-			surf[x+1][y] = [r, g, b]
-			surf[x-1][y] = [r, g, b]
-			surf[x][y+1] = [r, g, b]
-			surf[x][y-1] = [r, g, b]
+			surf[x + 1][y] = [r, g, b]
+			surf[x - 1][y] = [r, g, b]
+			surf[x][y + 1] = [r, g, b]
+			surf[x][y - 1] = [r, g, b]
 
 
 def render_main(reader_buf, reader_sync, max_loops=None, callback=None):
@@ -51,13 +38,15 @@ def render_main(reader_buf, reader_sync, max_loops=None, callback=None):
 	done = False
 	clock = pygame.time.Clock()
 	loops = 0
+	surf = pygame.surfarray.pixels3d(screen)
 	while not done:
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				done = True
 		screen.fill(BLACK)
 		reader_sync.start_read()
-		surf = pygame.surfarray.pixels3d(screen)
+
+		# renderops.render_buffer(surf, reader_buf)
 		render_buffer(surf, reader_buf)
 
 		reader_sync.finish_read()
