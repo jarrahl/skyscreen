@@ -45,7 +45,15 @@ class MMAPScreenReader(BaseMMapInterface, skyscreen.interface.ScreenReader):
 	def __enter__(self):
 
 		assert self.shared_memory is None, 'cannot open shared mem twice'
-		self.shared_handle = os.open(self.shared_file, self.file_mode)
+		try:
+			self.shared_handle = os.open(self.shared_file, self.file_mode)
+		except OSError:
+			logging.error('Got an OS error. Generally this means that '
+						  'the reader cannot access the shared file,'
+						  'and you need to set up the writer and call'
+						  'it\'s initalize method first')
+			raise
+
 		assert self.shared_handle, 'could not open: %s' % self.shared_file
 		self.shared_memory = mmap.mmap(self.shared_handle, self.array_size, mmap.MAP_SHARED, mmap.PROT_READ)
 		return self.shared_memory

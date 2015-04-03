@@ -32,36 +32,18 @@ def test_position_overflows():
 				assert position < Screen.array_size, '%d was out of range %d (%d, %d, %s)' %\
 													 (position, Screen.array_size, vane, pixel, channel)
 
-def _test_noise():
+def test_noise():
 	filename = tempfile.mktemp("")
 	writer = skyscreen.mmap_interface.MMAPScreenWriter(filename)
 	reader = skyscreen.mmap_interface.MMAPScreenReader(filename)
 	sync = skyscreen.interface.DummyReaderSync()
 
-	with writer as writer_buf:
-		for offset in range(len(writer_buf)):
-			c = str(unichr(random.randint(0, 127)))
-			writer_buf[offset] = c
+	def write_random():
+		with writer as writer_buf:
+			for offset in range(len(writer_buf)):
+				c = str(unichr(random.randint(0, 127)))
+				writer_buf[offset] = c
+	write_random()
 
 	with reader as reader_buf:
-		rendering.render_main(reader_buf, sync)
-
-def _test_red():
-	filename = tempfile.mktemp("")
-	writer = skyscreen.mmap_interface.MMAPScreenWriter(filename)
-	reader = skyscreen.mmap_interface.MMAPScreenReader(filename)
-	sync = skyscreen.interface.DummyReaderSync()
-
-	with writer as writer_buf:
-		for vane in xrange(Screen.screen_vane_count):
-			for pixel in xrange(Screen.screen_vane_length):
-				for channel in {'r', 'g', 'b'}:
-					if channel == 'r':
-						c = str(unichr(random.randint(0, 127)))
-					else:
-						c = '\0'
-					offset = pixel_vane_mapping(vane, pixel, channel)
-					writer_buf[offset] = c
-
-	with reader as reader_buf:
-		rendering.render_main(reader_buf, sync)
+		rendering.render_main(reader_buf, sync, callback=write_random)

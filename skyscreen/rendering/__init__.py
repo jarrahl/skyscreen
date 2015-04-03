@@ -36,7 +36,7 @@ def render_buffer(screen, reader_buf):
 			pygame.draw.ellipse(screen, (r, g, b), [x, y, 10, 10], 5)
 
 
-def render_main(reader_buf, reader_sync, max_loops=None):
+def render_main(reader_buf, reader_sync, max_loops=None, callback=None):
 	pygame.init()
 
 	size = (window_size, window_size)
@@ -59,6 +59,8 @@ def render_main(reader_buf, reader_sync, max_loops=None):
 		loops += 1
 		if max_loops and loops > max_loops:
 			done = True
+		if callback:
+			callback()
 
 		clock.tick(25)
 
