@@ -1,0 +1,7 @@
+*.pyc
+Skyscreen.egg-info/
+build*/
+dist/
+sky-screen.iml
+.idea
+
