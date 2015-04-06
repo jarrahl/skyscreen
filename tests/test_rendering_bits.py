@@ -1,14 +1,15 @@
-import logging
 import math
 import random
 import tempfile
 import skyscreen.mmap_interface
 import skyscreen.memmap_interface
-from skyscreen.interface import Screen, WriterSync, ReaderSync, pixel_vane_mapping
+from skyscreen.interface import Screen, pixel_vane_mapping
+
+
 import pyximport
 pyximport.install()
-import skyscreen.rendering as rendering
-import skyscreen.rendering.renderops as renderops
+import rendering as rendering
+import rendering.renderops as renderops
 
 
 def test_theta_calc():
@@ -53,18 +54,18 @@ def render(generate_callback):
 
 def test_noise():
 	def generate_write_random(writer):
-		def inner():
-			with writer as writer_buf:
+		with writer as writer_buf:
+			def inner():
 				for offset in range(len(writer_buf)):
 					c = random.randint(0, 255)
 					writer_buf[offset] = c
-		return inner
+			return inner
 	render(generate_write_random)
 
 def test_stripes():
 	def generate_write_random_stripes(writer):
-		def inner():
-			with writer as writer_buf:
+		with writer as writer_buf:
+			def inner():
 				for vane in range(Screen.screen_vane_count):
 					r = ((vane % 3) == 0) * 255
 					g = ((vane % 3 - 1) == 0) * 255
@@ -73,6 +74,6 @@ def test_stripes():
 						writer_buf[rendering.pixel_vane_mapping(vane, pixel, 'r')] = r
 						writer_buf[rendering.pixel_vane_mapping(vane, pixel, 'g')] = g
 						writer_buf[rendering.pixel_vane_mapping(vane, pixel, 'b')] = b
-		return inner
+			return inner
 
 	render(generate_write_random_stripes)

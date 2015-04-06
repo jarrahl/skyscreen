@@ -1,14 +1,13 @@
 import logging
-import ctypes
 import os
 import random
 import sys
-from skyscreen import rendering
+import argparse
+
 from skyscreen.interface import Screen, pixel_vane_mapping
 import skyscreen.memmap_interface
 import skyscreen.mmap_interface
-import argparse
-import numpy as np
+
 
 def noise(writer):
 	with writer as writer_buf:
