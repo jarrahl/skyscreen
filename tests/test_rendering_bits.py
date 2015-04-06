@@ -43,7 +43,10 @@ def test_position_overflows():
 def render(generate_callback):
 	filename = tempfile.mktemp("")
 	writer = skyscreen.memmap_interface.NPMMAPScreenWriter(filename)
+	# This ensures our file exists, then we replace it with another
+	# fresh instance.
 	writer.initialize_file()
+	writer = skyscreen.memmap_interface.NPMMAPScreenWriter(filename)
 	reader = skyscreen.memmap_interface.NPMMAPScreenReader(filename)
 	sync = skyscreen.interface.DummyReaderSync()
 
