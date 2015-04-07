@@ -20,6 +20,12 @@ int max(int i, int j) {
 
 int main(int argc, char** argv )
 {
+	VideoWriter* writer = NULL;
+	if (argc == 2) {
+		writer = new VideoWriter(argv[1], CV_FOURCC('P','I','M','1'), 25, Size(WINDOW_SIZE, WINDOW_SIZE), 1);
+		printf("WRITING VIDEO to %s\n", argv[1]);
+		assert(writer->isOpened());
+	}
 	Mat A(WINDOW_SIZE, WINDOW_SIZE, CV_8UC3);
 	const int fd = open("./foo", O_RDONLY);
 	if (fd == -1) {
@@ -79,6 +85,7 @@ int main(int argc, char** argv )
 	char k = -1;
 	while(k != (int)'q') {
 		imshow(WINDOW_NAME, A);
+		if (writer) writer->write(A);
 		k = waitKey(1);
 		
 		for (int vane = 0; vane < vane_count; vane++) {
