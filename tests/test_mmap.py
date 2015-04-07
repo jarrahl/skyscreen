@@ -15,7 +15,6 @@ def test_reader_open():
 	filename = tempfile.mktemp("")
 	with skyscreen.mmap_interface.MMAPScreenWriter(filename) as writer:
 		writer[0] = 'a'
-
 	with skyscreen.mmap_interface.MMAPScreenReader(filename) as reader:
 		assert reader[0] == 'a'
 

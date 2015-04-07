@@ -1,3 +1,12 @@
+"""
+This is a reference implementation of the readers and writers.
+
+It's very slow, but it's so simple that we couldn't possibly get it wrong :P
+
+It's used for testing against it. You know your reader is good if it works with
+the reference writer implementation, and you know your writer is good if it works
+with the reference reader implementation.
+"""
 import logging
 import os
 import mmap

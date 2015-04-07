@@ -1,3 +1,10 @@
+"""
+This is probably what you actually want to read and write to.
+These present something that is almost totally like a numpy
+array, so you can operate on it very very quickly with numpy
+operations.
+"""
+
 import logging
 import os
 import numpy as np
@@ -26,14 +33,6 @@ class NPMMAPScreenWriter(BaseMMapInterface, skyscreen.interface.ScreenWriter):
 						  mode='w+',
 						  shape=(self.screen_vane_count*self.screen_vane_length*3))
 		return array
-		"""
-		self.shared_handle = os.open(self.shared_file, self.file_mode)
-		assert self.shared_handle, 'could not open: %s' % self.shared_file
-		assert os.write(self.shared_handle, '\x00' * self.array_size) == self.array_size
-		self.shared_memory = mmap.mmap(self.shared_handle, self.array_size, mmap.MAP_SHARED, mmap.PROT_WRITE)
-		array = np.ndarray((self.screen_vane_count*self.screen_vane_length*3), dtype=np.byte, buffer=self.shared_memory)
-		return array
-		"""
 
 	def __enter__(self):
 		assert self.shared_memory is None, 'cannot open shared mem twice'

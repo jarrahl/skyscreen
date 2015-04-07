@@ -16,10 +16,29 @@ def test_blank_init_to_correct_interface():
 	with skyscreen.memmap_interface.NPMMAPScreenWriter(filename) as writer, \
 			skyscreen.mmap_interface.MMAPScreenReader(filename) as reader:
 		for i in range(len(reader)):
-			assert reader[i] == '\0', "%d was %s" % (i, reader[i])
+			assert ord(reader[i]) == 0, "%d was %s" % (i, reader[i])
 
 
 def test_send_data_to_correct_interface():
+	filename = tempfile.mktemp("")
+	with skyscreen.memmap_interface.NPMMAPScreenWriter(filename) as writer, \
+			skyscreen.mmap_interface.MMAPScreenReader(filename) as reader:
+		assert len(reader) == len(writer)
+		for i in range(100000):
+			offset = random.randint(0, len(writer) - 1)
+			v = random.randint(0, 255)
+			c = chr(v)
+			writer[offset] = v
+			assert reader[offset] == c
+
+def test_receive_blank_from_correct_interface():
+	filename = tempfile.mktemp("")
+	with skyscreen.mmap_interface.MMAPScreenWriter(filename) as writer, \
+			skyscreen.memmap_interface.NPMMAPScreenReader(filename) as reader:
+		for i in range(len(reader)):
+			assert reader[i] == 0, "%d was %s" % (i, reader[i])
+
+def test_receive_datafrom_correct_interface():
 	filename = tempfile.mktemp("")
 	with skyscreen.memmap_interface.NPMMAPScreenWriter(filename) as writer, \
 			skyscreen.mmap_interface.MMAPScreenReader(filename) as reader:
