@@ -1,0 +1,27 @@
+package{"python-pip": ensure => "installed"}
+package{"python-dev": ensure => "installed"}
+package{"libopencv-dev": ensure => "installed"}
+package{"build-essential": ensure => "installed"}
+package{"gcc": ensure => "installed"}
+package{"cmake": ensure => "installed"}
+package{"make": ensure => "installed"}
+
+$base_path="/home/teameng/skyscreen"
+$user="teameng"
+
+Exec {path => ["/bin/", "/sbin/", "/usr/bin/", "/usr/sbin/"]}
+
+exec {"first-build":
+	creates => "${base_path}/cpp/Makefile",
+	command => "cmake .",
+	cwd => "${base_path}/cpp/",
+	user => $user,
+	require => Package["cmake", "make", "gcc", 'build-essential', "libopencv-dev"],
+}->
+exec {"first-build-make":
+	creates => "${base_path}/cpp/DisplayImage",
+	command => "make",
+	cwd => "${base_path}/cpp/",
+	user => $user,
+}
+
