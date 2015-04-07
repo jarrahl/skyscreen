@@ -1,15 +1,19 @@
 # Skyscreen #
-This is the python code I'm working on for skyscreen. It's meant to be sort of language agnostic. At it's heart is a communications method that can be used by pretty much any programming language.
+This is the python code I'm working on for skyscreen. It's meant to be sort of language agnostic. 
+At it's heart is a communications method that can be used by pretty much any programming language.
 
 ## Communication ##
 The 'skyscreen communication' standard has two parts:
 1. An large array of bytes, each byte being a pixel's color's intensity. 
 2. A 'flush' method which signals that the frame is ready for display.
 
-For the receiver, it's more or less the same, but the 'flush' method has two parts, one where it acquires the memory area and one where it releases it back to the writer.
+For the receiver, it's more or less the same, but the 'flush' method has two parts, 
+one where it acquires the memory area and one where it releases it back to the writer.
 
 ## Implementation ##
-The current implementation uses a memory mapped file that we can share between writer and reader, and a semaphore to implement flush, but I'll be abstracting out the flush synchronization mechanism for testability (at some point).
+The current implementation uses a memory mapped file that we can share between writer and reader, 
+and a semaphore to implement flush, but I'll be abstracting out the flush synchronization mechanism 
+for testability (at some point).
 
 In the future I'd like to implement:
 
@@ -25,6 +29,17 @@ In the future I'd like to implement:
 - sudo puppet apply setup.pp
 - You should be good to go
 
+## Building the rendering ##
+
+You shouldn't need to do this - it's done as part of setup.pp, but if you 
+need to, here's how:
+
+- cd rednering
+- cmake .
+- make 
+
+Once you've got cmake to run once, you can just keep using make to build it.
+
 # Running & Testing #
 
 You can test this pretty easily - just run:
@@ -33,7 +48,7 @@ You can test this pretty easily - just run:
     
 And they should all pass, although they'll spam the screen with some pygame windows.
 
-To run it, you've got a few options. The number one option is to use the rendering system in the cpp directory.
+To run it, you've got a few options. The number one option is to use the rendering system in the rendering directory.
 
 This will use the file 'foo' in the CWD as the mmap region. Once you've started this process, you can
 start your own code to write to that region. To test everything is working as expected, try running 
