@@ -2,35 +2,35 @@ import random
 import tempfile
 import subprocess
 
-import skyscreen.mmap_interface
+import skyscreen_core.mmap_interface
 
 
 def test_writer_open():
 	filename = tempfile.mktemp("")
-	with skyscreen.mmap_interface.MMAPScreenWriter(filename) as writer:
+	with skyscreen_core.mmap_interface.MMAPScreenWriter(filename) as writer:
 		writer[0] = 'a'
 
 
 def test_reader_open():
 	filename = tempfile.mktemp("")
-	with skyscreen.mmap_interface.MMAPScreenWriter(filename) as writer:
+	with skyscreen_core.mmap_interface.MMAPScreenWriter(filename) as writer:
 		writer[0] = 'a'
-	with skyscreen.mmap_interface.MMAPScreenReader(filename) as reader:
+	with skyscreen_core.mmap_interface.MMAPScreenReader(filename) as reader:
 		assert reader[0] == 'a'
 
 
 def test_blank_init():
 	filename = tempfile.mktemp("")
-	with skyscreen.mmap_interface.MMAPScreenWriter(filename) as writer, \
-			skyscreen.mmap_interface.MMAPScreenReader(filename) as reader:
+	with skyscreen_core.mmap_interface.MMAPScreenWriter(filename) as writer, \
+			skyscreen_core.mmap_interface.MMAPScreenReader(filename) as reader:
 		for i in range(len(reader)):
 			assert (reader[i] == '\0')
 
 
 def test_send_data():
 	filename = tempfile.mktemp("")
-	with skyscreen.mmap_interface.MMAPScreenWriter(filename) as writer, \
-			skyscreen.mmap_interface.MMAPScreenReader(filename) as reader:
+	with skyscreen_core.mmap_interface.MMAPScreenWriter(filename) as writer, \
+			skyscreen_core.mmap_interface.MMAPScreenReader(filename) as reader:
 		assert len(reader) == len(writer)
 		for i in range(100000):
 			offset = random.randint(0, len(writer) - 1)

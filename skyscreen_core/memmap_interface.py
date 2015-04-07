@@ -9,7 +9,7 @@ import logging
 import os
 import numpy as np
 import mmap
-import skyscreen.interface
+import skyscreen_core.interface
 
 
 class BaseMMapInterface(object):
@@ -21,7 +21,7 @@ class BaseMMapInterface(object):
 		assert self.shared_memory is not None, 'already closed, or never opened'
 		del self.shared_memory
 
-class NPMMAPScreenWriter(BaseMMapInterface, skyscreen.interface.ScreenWriter):
+class NPMMAPScreenWriter(BaseMMapInterface, skyscreen_core.interface.ScreenWriter):
 	file_mode = os.O_RDWR
 
 	def __init__(self, shared_file):
@@ -42,7 +42,7 @@ class NPMMAPScreenWriter(BaseMMapInterface, skyscreen.interface.ScreenWriter):
 						  shape=(self.screen_vane_count*self.screen_vane_length*3))
 		return self.shared_memory
 
-class NPMMAPScreenReader(BaseMMapInterface, skyscreen.interface.ScreenWriter):
+class NPMMAPScreenReader(BaseMMapInterface, skyscreen_core.interface.ScreenWriter):
 	def __init__(self, shared_file):
 		super(NPMMAPScreenReader, self).__init__(shared_file)
 

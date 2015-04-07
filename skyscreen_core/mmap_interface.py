@@ -10,7 +10,7 @@ with the reference reader implementation.
 import logging
 import os
 import mmap
-import skyscreen.interface
+import skyscreen_core.interface
 
 
 class BaseMMapInterface(object):
@@ -27,7 +27,7 @@ class BaseMMapInterface(object):
 		self.shared_memory = None
 
 
-class MMAPScreenWriter(BaseMMapInterface, skyscreen.interface.ScreenWriter):
+class MMAPScreenWriter(BaseMMapInterface, skyscreen_core.interface.ScreenWriter):
 	file_mode = os.O_CREAT | os.O_RDWR
 
 	def __init__(self, shared_file):
@@ -44,7 +44,7 @@ class MMAPScreenWriter(BaseMMapInterface, skyscreen.interface.ScreenWriter):
 		self.shared_memory = mmap.mmap(self.shared_handle, self.array_size, mmap.MAP_SHARED, mmap.PROT_WRITE)
 		return self.shared_memory
 
-class MMAPScreenReader(BaseMMapInterface, skyscreen.interface.ScreenReader):
+class MMAPScreenReader(BaseMMapInterface, skyscreen_core.interface.ScreenReader):
 	file_mode = os.O_RDONLY
 
 	def __init__(self, shared_file):
@@ -65,7 +65,7 @@ class MMAPScreenReader(BaseMMapInterface, skyscreen.interface.ScreenReader):
 		self.shared_memory = mmap.mmap(self.shared_handle, self.array_size, mmap.MAP_SHARED, mmap.PROT_READ)
 		return self.shared_memory
 
-class SemaphoreWriterSync(skyscreen.interface.WriterSync):
+class SemaphoreWriterSync(skyscreen_core.interface.WriterSync):
 	def __init__(self, sem):
 		self.sem = sem
 		assert sem.acquire(blocking=False),\
@@ -76,7 +76,7 @@ class SemaphoreWriterSync(skyscreen.interface.WriterSync):
 		self.sem.release()
 		self.sem.acquire()
 
-class SemaphoreReaderSync(skyscreen.interface.ReaderSync):
+class SemaphoreReaderSync(skyscreen_core.interface.ReaderSync):
 	def __init__(self, sem):
 		self.sem = sem
 		assert not sem.acquire(blocking=False), \

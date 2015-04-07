@@ -7,9 +7,9 @@ import time
 
 import numpy as np
 
-from skyscreen.interface import Screen, pixel_vane_mapping
-import skyscreen.memmap_interface
-import skyscreen.mmap_interface
+from skyscreen_core.interface import Screen, pixel_vane_mapping
+import skyscreen_core.memmap_interface
+import skyscreen_core.mmap_interface
 
 TARGET_FPS=25
 
@@ -101,7 +101,7 @@ def main():
 	parser.add_argument('name', help='The name of the program to run')
 	args = parser.parse_args()
 
-	writer = skyscreen.memmap_interface.NPMMAPScreenWriter(shared_file)
+	writer = skyscreen_core.memmap_interface.NPMMAPScreenWriter(shared_file)
 	if args.name == 'noise':
 		noise(writer)
 	elif args.name == 'bands':
