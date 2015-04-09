@@ -38,4 +38,9 @@ implementation.
 
 Bug Log
 =======
-Thu Apr  9 22:50:22 AEST 2015 - 
+- Thu Apr  9 22:50:22 AEST 2015 - 86c3da9f2e7bb5f5144dcca214e9972932764509: skyscreen_tools/mapping.py:77
+  This was meant to be transposed. It's a pretty obvious issue - the new size is cols by rows, not rows
+  by cols. 
+- Thu Apr  9 23:15:19 AEST 2015 - 86c3da9f2e7bb5f5144dcca214e9972932764509: skyscreen_tools/mapping.py:55
+  I derped and repeated (num_row, num_row), rather than (num_row, num_col). I fixed it while perusing my 
+  code.

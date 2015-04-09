@@ -52,7 +52,7 @@ class MappingOver(object):
 		num_rows = self.bottomright_row-self.topleft_row
 		num_cols = self.bottomright_col-self.topleft_col
 		assert transformed.shape == (num_rows, num_cols, 3)
-		transformed.resize((num_rows*num_rows, 5))
+		transformed.resize((num_rows*num_cols, 5))
 		# This loop is a problem. Port to cython
 		xs = transformed[:, 0]
 		ys = transformed[:, 1]
@@ -74,12 +74,12 @@ class MappingOver(object):
 							 self.bottomright_row,
 							 num_rows,
 							 endpoint=False)
-		px_rows = np.resize(px_row, (num_rows, num_cols))
+		px_rows = np.resize(px_row, (num_cols, num_rows)).T
 		px_col = np.linspace(self.topleft_col,
 							 self.bottomright_col,
 							 num_cols,
 							 endpoint=False)
-		px_cols = np.resize(px_col, (num_cols, num_rows)).T
+		px_cols = np.resize(px_col, (num_rows, num_cols))
 		result = np.zeros((num_rows, num_cols, 2))
 		result[:, :, 0] = px_rows
 		result[:, :, 1] = px_cols
