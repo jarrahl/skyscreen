@@ -1,14 +1,17 @@
 import skyscreen_tools.mapping as mapping
 import numpy as np
 
+
 def quick_init():
 	domain = np.array([[1, 5], [11, 13]])
-	location_transform = np.random.random(size=(2,2))
-	color_transform = np.random.random(size=(3,3))
+	location_transform = np.random.random(size=(2, 2))
+	color_transform = np.random.random(size=(3, 3))
 	return mapping.MappingOver(domain, location_transform, color_transform)
+
 
 def test_init():
 	quick_init()
+
 
 def test_space_build():
 	mapping = quick_init()
@@ -17,6 +20,7 @@ def test_space_build():
 		for c in xrange(mapping.bottomright_col, mapping.topleft_col):
 			assert transformed_space[r, c, 0] == r, '%d was not %d' % (transformed_space[r, c, 0], r)
 			assert transformed_space[r, c, 1] == c, '%d was not %d' % (transformed_space[r, c, 1], c)
+
 
 def test_transform_construction_single():
 	mapping = quick_init()
@@ -34,6 +38,7 @@ def test_transform_construction_single():
 	print expected_position, expected_color
 	assert np.all(got[0:2] == expected_position)
 	assert np.all(got[2:5] == expected_color)
+
 
 def test_transform_construction_multiple():
 	mapping = quick_init()

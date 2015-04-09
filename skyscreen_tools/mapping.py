@@ -26,7 +26,7 @@ class MappingOver(object):
 		assert location_transform.shape == (2, 2)
 		assert color_transform.shape == (3, 3)
 		self.n_location_transform = location_transform
-		self.n_color_transform= color_transform
+		self.n_color_transform = color_transform
 
 		self.topleft_row = domain[0, 0]
 		self.topleft_col = domain[0, 1]
@@ -41,7 +41,7 @@ class MappingOver(object):
 
 	def numpy_fn(self, input):
 		sub_slice = input[self.topleft_row:self.bottomright_row,
-					      self.topleft_col:self.bottomright_col]
+					self.topleft_col:self.bottomright_col]
 		transformed_space = self.build_transformed_space()
 		transform_input = np.concatenate([transformed_space, sub_slice], axis=2)
 		full_transform = self.construct_full_transform()
@@ -49,10 +49,10 @@ class MappingOver(object):
 		self.apply_transform(transformed_result, input)
 
 	def apply_transform(self, transformed, input):
-		num_rows = self.bottomright_row-self.topleft_row
-		num_cols = self.bottomright_col-self.topleft_col
+		num_rows = self.bottomright_row - self.topleft_row
+		num_cols = self.bottomright_col - self.topleft_col
 		assert transformed.shape == (num_rows, num_cols, 3)
-		transformed.resize((num_rows*num_cols, 5))
+		transformed.resize((num_rows * num_cols, 5))
 		# This loop is a problem. Port to cython
 		xs = transformed[:, 0]
 		ys = transformed[:, 1]
@@ -62,7 +62,7 @@ class MappingOver(object):
 
 
 	def construct_full_transform(self):
-		full_transform = np.zeros((5,5))
+		full_transform = np.zeros((5, 5))
 		full_transform[0:2, 0:2] = self.n_location_transform
 		full_transform[2:5, 2:5] = self.n_color_transform
 		return full_transform
