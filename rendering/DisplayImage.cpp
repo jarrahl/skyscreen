@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include <stdio.h>
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <opencv2/opencv.hpp>
+#include <stdlib.h>     /* getenv */
 
 using namespace cv;
 const char* WINDOW_NAME = "Display Image";
@@ -27,9 +27,14 @@ int main(int argc, char** argv )
 		assert(writer->isOpened());
 	}
 	Mat A(WINDOW_SIZE, WINDOW_SIZE, CV_8UC3);
-	const int fd = open("./foo", O_RDONLY);
+	char* filePath = getenv ("WRITER_FILE");
+	if (filePath == NULL) {
+		printf("You must specify a file in the WRITER_FILE environment variable\n");
+		exit(1);
+	}
+	const int fd = open(filePath, O_RDONLY);
 	if (fd == -1) {
-		printf("Open file foo failed\n");
+		printf("Open file %s failed\n", filePath);
 		exit(1);
 	}
 

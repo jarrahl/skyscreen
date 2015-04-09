@@ -3,7 +3,9 @@ import logging
 
 class Screen(object):
 	screen_vane_length = 144 * 2
+	screen_rows = screen_vane_length
 	screen_vane_count = 360
+	screen_cols = screen_vane_count
 	array_size = screen_vane_count * screen_vane_length * 3
 
 chanmap = {
