@@ -1,12 +1,12 @@
 import logging
 import sys
 import time
-from screens.__main__ import TARGET_FPS
+TARGET_FPS = 25
 
 from skyscreen_core.interface import Screen
 
 
-def theano_scan(writer):
+def theano_scan(writer, style='swirl'):
 	try:
 		import theano
 		import theano.tensor as T
@@ -26,8 +26,15 @@ def theano_scan(writer):
 		px_vec = T.as_tensor(px_matrix)
 		step = T.fscalar('step')
 
-		def draw(vane, px):
-			return 255*T.sin((vane+px+step)/25.0)
+		if style=='swirl':
+			def draw(vane, px):
+				return 127*T.sin((vane+px/2+step)/40.0) + 127*T.sin((vane+px/2+step*1.3)/40.0)
+		else:
+			def draw(vane, px):
+				vane_expr = vane / float(Screen.screen_vane_count) * 3.141
+				px_expr = px / float(Screen.screen_vane_length)
+				step_expr = step
+				return 255*T.sin(vane_expr + step_expr/50)*T.sin(px_expr + step_expr/50)
 
 		f, _ = theano.map(draw, [vane_vec, px_vec])
 
