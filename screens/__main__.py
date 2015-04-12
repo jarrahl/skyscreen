@@ -11,6 +11,7 @@ import bands
 import noise
 import theano_examples
 import skyscreen_core.memmap_interface
+import skyscreen_core.interface
 
 
 TARGET_FPS=25
@@ -28,14 +29,17 @@ def main():
 	args = parser.parse_args()
 
 	writer = skyscreen_core.memmap_interface.NPMMAPScreenWriter(shared_file)
+	lock = skyscreen_core.interface.FlockWriterSync(shared_file)
 	if args.name == 'noise':
-		noise.noise(writer)
+		noise.noise(writer, lock)
 	elif args.name == 'bands':
-		bands.bands(writer)
+		bands.bands(writer, lock)
 	elif args.name == 'npnoise':
-		noise.numpy_random(writer)
+		noise.numpy_random(writer, lock)
 	elif args.name == 'theano.scan':
-		theano_examples.theano_scan(writer)
+		theano_examples.theano_scan(writer, lock)
+	elif args.name == 'theano.radar':
+		theano_examples.theano_scan(writer, lock, style='tripdar')
 	else:
 		logging.error('Unknown name "%s"', args.name)
 		sys.exit(1)

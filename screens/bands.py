@@ -11,7 +11,7 @@ from skyscreen_core.interface import Screen, pixel_vane_mapping
 import skyscreen_core.memmap_interface
 import skyscreen_core.mmap_interface
 
-def bands(writer):
+def bands(writer, lock):
 	r = (255, 0, 0)
 	g = (0, 255, 0)
 	b = (0, 0, 255)
@@ -21,6 +21,7 @@ def bands(writer):
 
 	with writer as writer_buf:
 		writer_buf_reshaped = writer_buf.reshape((Screen.screen_vane_count, Screen.screen_vane_length, 3))
+		lock.frame_ready()
 		while True:
 			for band in xrange(Screen.screen_vane_count):
 				band_matrix[band, :, 0] = 255 * (band % 3 == ((count + 0) % 3))

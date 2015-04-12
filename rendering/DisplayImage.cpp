@@ -2,6 +2,7 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <opencv2/opencv.hpp>
+#include <sys/file.h>
 #include <stdlib.h>     /* getenv */
 
 using namespace cv;
@@ -92,7 +93,7 @@ int main(int argc, char** argv )
 		imshow(WINDOW_NAME, A);
 		if (writer) writer->write(A);
 		k = waitKey(1);
-		
+		flock(fd, LOCK_EX);
 		for (int vane = 0; vane < vane_count; vane++) {
 			for (int pixel = 0; pixel < pixel_count; pixel++) {
 				int x = (WINDOW_SIZE/2) + (int)x_coords.at<float>(vane, pixel);
@@ -126,6 +127,7 @@ int main(int argc, char** argv )
 				A.at<char>(x, y*3+2-3) = r;
 			}
 		}
+		flock(fd, LOCK_UN);
 	}
 	return 0;
 }

@@ -6,7 +6,7 @@ TARGET_FPS = 25
 from skyscreen_core.interface import Screen
 
 
-def theano_scan(writer, style='swirl'):
+def theano_scan(writer, lock, style='swirl'):
 	try:
 		import theano
 		import theano.tensor as T
@@ -42,6 +42,7 @@ def theano_scan(writer, style='swirl'):
 
 		step_actual = 0
 		while True:
+			lock.frame_ready()
 			start = time.time()
 			writer_buf_reshaped[:] = fn_actual(step_actual)
 			step_actual -= 1
