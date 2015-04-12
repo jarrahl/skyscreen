@@ -28,6 +28,16 @@ In the future I'd like to implement:
 - Copy setup.pp.skeleton to setup.pp, making changes to the variables base_path and user
 - sudo puppet apply setup.pp
 - You should be good to go
+- You'll also need to install some python dependencies. I _stronly_ recommend doing this in a virtual environment, and using http://virtualenvwrapper.readthedocs.org/en/latest/install.html to help out. However you choose to run python, you'll need to install theano, numpy and scipy:
+  - pip install numpy scipy theano
+  - If you want to try out GPU rendering you'll need to set up CUDA, there are guides on the theano website.
+- If you use a GPU, then you should run your screens with the GPU theano flags. I successfully used:
+ ```
+ THEANO_FLAGS=device=gpu,floatX=float32,print_active_device=True
+```
+Although this hasn't yielded any large speedups that I can see, but I'm not sure if that's just because the computation isn't very complex.
+
+
 
 ## Building the rendering ##
 
@@ -57,4 +67,3 @@ an example screen:
     WRITER_FILE=foo python -m screens noise
     
 Once you're finished, just kill the processes.
-
