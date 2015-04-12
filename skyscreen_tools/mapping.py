@@ -53,11 +53,11 @@ class MappingOver(object):
 		num_cols = self.bottomright_col - self.topleft_col
 		assert transformed.shape == (num_rows, num_cols, 3)
 		transformed.resize((num_rows * num_cols, 5))
-		# This loop is a problem. Port to cython
 		xs = transformed[:, 0]
 		ys = transformed[:, 1]
 		colors = transformed[:, 2:]
-		# This part may be a problem... We'll see!
+		# This part may be a problem... We'll see!, but it may need
+		# to be ported to cython.
 		input[xs, ys] = colors
 
 

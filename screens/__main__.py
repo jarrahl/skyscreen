@@ -36,10 +36,14 @@ def main():
 		bands.bands(writer, lock)
 	elif args.name == 'npnoise':
 		noise.numpy_random(writer, lock)
-	elif args.name == 'theano.scan':
-		theano_examples.theano_scan(writer, lock)
+	elif args.name == 'theano.swirl':
+		theano_examples.theano_swirl(writer, lock)
+	elif args.name == 'theano.tripdar':
+		theano_examples.theano_tripdar(writer, lock)
 	elif args.name == 'theano.radar':
-		theano_examples.theano_scan(writer, lock, style='tripdar')
+		theano_examples.theano_radar(writer, lock)
+	elif args.name == 'theano.droplet':
+		theano_examples.theano_droplet(writer, lock)
 	else:
 		logging.error('Unknown name "%s"', args.name)
 		sys.exit(1)
