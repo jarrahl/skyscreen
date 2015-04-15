@@ -3,6 +3,7 @@
 
 package{"python-pip": ensure => "installed"}
 package{"python-numpy": ensure => "installed"}
+package{"python-virtualenv": ensure => "installed"}
 package{"python-dev": ensure => "installed"}
 package{"libopencv-dev": ensure => "installed"}
 package{"build-essential": ensure => "installed"}
@@ -32,7 +33,7 @@ exec {"first-build-make":
 exec {"virtualenv --system-site-packages ${venv}":
 	user => $user,
 	creates => ["${base_path}/env/bin/pip"],
-	require => Package["python-pip", "python-numpy", "python-dev"]
+	require => Package["python-virtualenv", "python-pip", "python-numpy", "python-dev"]
 }->
 python::pip{"nose": 
 	pkgname => "nose",
