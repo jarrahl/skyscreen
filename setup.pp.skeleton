@@ -12,16 +12,16 @@ $user="teameng"
 Exec {path => ["/bin/", "/sbin/", "/usr/bin/", "/usr/sbin/"]}
 
 exec {"first-build":
-	creates => "${base_path}/cpp/Makefile",
+	creates => "${base_path}/rendering/Makefile",
 	command => "cmake .",
-	cwd => "${base_path}/cpp/",
+	cwd => "${base_path}/rendering/",
 	user => $user,
 	require => Package["cmake", "make", "gcc", 'build-essential', "libopencv-dev"],
 }->
 exec {"first-build-make":
-	creates => "${base_path}/cpp/DisplayImage",
+	creates => "${base_path}/rendering/DisplayImage",
 	command => "make",
-	cwd => "${base_path}/cpp/",
+	cwd => "${base_path}/rendering/",
 	user => $user,
 }
 

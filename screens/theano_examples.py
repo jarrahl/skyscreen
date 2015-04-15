@@ -26,6 +26,7 @@ def theano_scan(writer, lock, draw_fn):
 
 		step_actual = 0
 		while True:
+			lock.frame_ready()
 			start = time.time()
 			writer_buf_reshaped[:] = fn_actual(step_actual)
 			step_actual -= 1
@@ -86,7 +87,7 @@ def theano_radar(writer, lock):
 	def theano_fn(step):
 		def draw(vane, px, col):
 			radar_vane = (step % Screen.screen_vane_count)
-			vane_distance = T.clip((Screen.screen_vane_count-(vane - radar_vane) % Screen.screen_vane_count)/Screen.screen_vane_count, 0.0, 1.0)
+			vane_distance = T.clip(((vane - radar_vane) % Screen.screen_vane_count)/Screen.screen_vane_count, 0.0, 1.0)
 			vane_expr = T.clip(vane_distance/2.0 + 0.5, 0, 1) * 255
 
 			return T.clip(vane_expr, 0, 255)
