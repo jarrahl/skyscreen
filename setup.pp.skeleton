@@ -2,12 +2,15 @@
 # puppet module install stankevich-python
 
 package{"python-pip": ensure => "installed"}
+package{"libblas-dev": ensure => "installed"}
+package{"liblapack-dev": ensure => "installed"}
 package{"python-numpy": ensure => "installed"}
 package{"python-virtualenv": ensure => "installed"}
 package{"python-dev": ensure => "installed"}
 package{"libopencv-dev": ensure => "installed"}
 package{"build-essential": ensure => "installed"}
 package{"gcc": ensure => "installed"}
+package{"gfortran": ensure => "installed"}
 package{"cmake": ensure => "installed"}
 package{"make": ensure => "installed"}
 
@@ -40,17 +43,20 @@ python::pip{"nose":
 	pkgname => "nose",
 	ensure => "present",
 	virtualenv => $venv,
+	owner => $user,
 	require => Exec["virtualenv --system-site-packages ${venv}"],
 }
 python::pip{"numpy":
-	pkgname => "nose",
+	pkgname => "numpy",
 	ensure => "present",
 	virtualenv => $venv,
+	owner => $user,
 	require => Exec["virtualenv --system-site-packages ${venv}"],
 }
 python::pip{"theano":
-	pkgname => "nose",
+	pkgname => "theano",
 	ensure => "present",
 	virtualenv => $venv,
+	owner => $user,
 	require => Exec["virtualenv --system-site-packages ${venv}"],
 }

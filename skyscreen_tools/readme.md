@@ -4,6 +4,7 @@ They're a collection of useful functions and ideas that I hope help you to
 make your own cool visualizations.
 
 Amongst them are:
+
  - Kaleidoscope tools, to divide the screen up into equal parts and mirror between them
  - Various "propagators" which let your writes to one area propagate to others
  - Tools for composing different screens, to create awesome overlays, in both space and time
@@ -15,6 +16,7 @@ These are all implemented with theano, for that speedy speed.
 Core Abstractions
 =================
 We create a set of core abstractions that work in terms of:
+
  - Mapping matrices, which we use to move things around
    - A Kaleidoscope is then just a set of simple mappings
  - Propagators, which are a little like cellular automata. We define a 
@@ -38,6 +40,7 @@ implementation.
 
 Bug Log
 =======
+
 - Thu Apr  9 22:50:22 AEST 2015 - 86c3da9f2e7bb5f5144dcca214e9972932764509: skyscreen_tools/mapping.py:77
   This was meant to be transposed. It's a pretty obvious issue - the new size is cols by rows, not rows
   by cols. 

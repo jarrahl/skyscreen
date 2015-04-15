@@ -27,10 +27,12 @@ In the future I'd like to implement:
 - Install puppet
 - Copy setup.pp.skeleton to setup.pp, making changes to the variables base_path and user
 - sudo puppet apply setup.pp
+- **you need to 'activate' your virtual environment. run:```source env/bin/activate``` to do so. You need to do this 
+  in each new terminal, so that when you call python it's the one in env**
+  (you can check by executing ```which python```, and it should be inside env/bin.
 - You should be good to go
-- You'll also need to install some python dependencies. I _stronly_ recommend doing this in a virtual environment, and using http://virtualenvwrapper.readthedocs.org/en/latest/install.html to help out. However you choose to run python, you'll need to install theano, numpy and scipy:
-  - pip install numpy scipy theano
-  - If you want to try out GPU rendering you'll need to set up CUDA, there are guides on the theano website.
+- If you have import issues with theano, do ```pip install theano``` (again in the virtual environment). The puppet 
+  script can be a bit dodgy sometimes.
 - If you use a GPU, then you should run your screens with the GPU theano flags. I successfully used:
  ```
  THEANO_FLAGS=device=gpu,floatX=float32,print_active_device=True
