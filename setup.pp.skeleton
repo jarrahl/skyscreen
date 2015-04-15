@@ -34,10 +34,23 @@ exec {"virtualenv --system-site-packages ${venv}":
 	user => $user,
 	creates => ["${base_path}/env/bin/pip"],
 	require => Package["python-virtualenv", "python-pip", "python-numpy", "python-dev"]
-}->
+}
+
 python::pip{"nose": 
 	pkgname => "nose",
 	ensure => "present",
 	virtualenv => $venv,
+	require => Exec["virtualenv --system-site-packages ${venv}"],
 }
-
+python::pip{"numpy":
+	pkgname => "nose",
+	ensure => "present",
+	virtualenv => $venv,
+	require => Exec["virtualenv --system-site-packages ${venv}"],
+}
+python::pip{"theano":
+	pkgname => "nose",
+	ensure => "present",
+	virtualenv => $venv,
+	require => Exec["virtualenv --system-site-packages ${venv}"],
+}
