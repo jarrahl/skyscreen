@@ -1,4 +1,8 @@
+# You should install the stankevich-python module:
+# puppet module install stankevich-python
+
 package{"python-pip": ensure => "installed"}
+package{"python-numpy": ensure => "installed"}
 package{"python-dev": ensure => "installed"}
 package{"libopencv-dev": ensure => "installed"}
 package{"build-essential": ensure => "installed"}
@@ -8,8 +12,9 @@ package{"make": ensure => "installed"}
 
 $base_path="/home/teameng/skyscreen"
 $user="teameng"
+$venv="${base_path}/env"
 
-Exec {path => ["/bin/", "/sbin/", "/usr/bin/", "/usr/sbin/"]}
+Exec {path => ["/bin/", "/sbin/", "/usr/bin/", "/usr/sbin/", "/usr/local/bin/"]}
 
 exec {"first-build":
 	creates => "${base_path}/rendering/Makefile",
@@ -23,5 +28,15 @@ exec {"first-build-make":
 	command => "make",
 	cwd => "${base_path}/rendering/",
 	user => $user,
+}
+exec {"virtualenv --system-site-packages ${venv}":
+	user => $user,
+	creates => ["${base_path}/env/bin/pip"],
+	require => Package["python-pip", "python-numpy", "python-dev"]
+}->
+python::pip{"nose": 
+	pkgname => "nose",
+	ensure => "present",
+	virtualenv => $venv,
 }
 
