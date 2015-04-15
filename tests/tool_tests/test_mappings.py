@@ -55,7 +55,7 @@ def test_transform_construction_multiple():
 	assert np.all(got[0:2] == expected_position)
 	assert np.all(got[2:5] == expected_color)
 
-def test_apply_transform():
+def _test_apply_transform():
 	mapping = quick_init()
 	transformed = np
 	mapping.apply_transform()
