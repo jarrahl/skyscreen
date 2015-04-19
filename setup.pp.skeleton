@@ -1,18 +1,55 @@
 # You should install the stankevich-python module:
-# puppet module install stankevich-python
+# sudo puppet module install stankevich-python
 
-package{"python-pip": ensure => "installed"}
-package{"libblas-dev": ensure => "installed"}
-package{"liblapack-dev": ensure => "installed"}
-package{"python-numpy": ensure => "installed"}
-package{"python-virtualenv": ensure => "installed"}
-package{"python-dev": ensure => "installed"}
-package{"libopencv-dev": ensure => "installed"}
-package{"build-essential": ensure => "installed"}
-package{"gcc": ensure => "installed"}
-package{"gfortran": ensure => "installed"}
-package{"cmake": ensure => "installed"}
-package{"make": ensure => "installed"}
+exec {'apt-get update':}
+package{"python-pip":
+	ensure => "installed",
+	require => Exec['apt-get update'],
+}
+package{"libblas-dev":
+	ensure => "installed",
+	require => Exec['apt-get update'],
+}
+package{"liblapack-dev":
+	ensure => "installed",
+	require => Exec['apt-get update'],
+}
+package{"python-numpy":
+	ensure => "installed",
+	require => Exec['apt-get update'],
+}
+package{"python-virtualenv":
+	ensure => "installed",
+	require => Exec['apt-get update'],
+}
+package{"python-dev":
+	ensure => "installed",
+	require => Exec['apt-get update'],
+}
+package{"libopencv-dev":
+	ensure => "installed",
+	require => Exec['apt-get update'],
+}
+package{"build-essential":
+	ensure => "installed",
+	require => Exec['apt-get update'],
+}
+package{"gcc":
+	ensure => "installed",
+	require => Exec['apt-get update'],
+}
+package{"gfortran":
+	ensure => "installed",
+	require => Exec['apt-get update'],
+}
+package{"cmake":
+	ensure => "installed",
+	require => Exec['apt-get update'],
+}
+package{"make":
+	ensure => "installed",
+	require => Exec['apt-get update'],
+}
 
 $base_path="/home/teameng/skyscreen"
 $user="teameng"

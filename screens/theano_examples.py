@@ -99,7 +99,7 @@ def theano_droplet(writer, lock):
 		def draw(vane, px, col):
 			ring = Screen.screen_vane_length-(step/3 % Screen.screen_vane_length)
 			ring_dist = T.maximum(0, float(Screen.screen_vane_length)/(ring-px))
-			circ_adjustment = vane
 			return T.clip(ring_dist, 0, 255)
 		return draw
 	theano_scan_color(writer, lock, theano_fn)
+
