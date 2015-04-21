@@ -1,7 +1,10 @@
 import logging
 import sys
-import theano
-import theano.tensor as T
+try:
+	import theano
+	import theano.tensor as T
+except ImportError:
+	logging.error('You do not have theano! theano. calls will FAIL')
 import time
 TARGET_FPS = 25
 

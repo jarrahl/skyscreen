@@ -77,12 +77,12 @@ class FlockWriterSync(WriterSync):
 	def __init__(self, lock_file):
 		self.lock_file = lock_file
 		self.lock_handle = os.open(self.lock_file, os.O_RDONLY)
-		logging.warning("Locking file %s", self.lock_file)
+		logging.info("Locking file %s", self.lock_file)
 		fcntl.flock(self.lock_handle, fcntl.LOCK_EX)
 	
 	def frame_ready(self):
-		logging.warning('Frame ready, unclocking %s', self.lock_file)
+		logging.info('Frame ready, unclocking %s', self.lock_file)
 		fcntl.flock(self.lock_handle, fcntl.LOCK_UN)
-		logging.warning('re-locking %s', self.lock_file)
+		logging.info('re-locking %s', self.lock_file)
 		fcntl.flock(self.lock_handle, fcntl.LOCK_EX)
-		logging.warning('Locked %s', self.lock_file)
+		logging.info('Locked %s', self.lock_file)

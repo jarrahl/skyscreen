@@ -54,7 +54,7 @@ int main(int argc, char** argv )
 		for (int pixel = 0; pixel < pixel_count; pixel++) {
 			float a = vane / ((float)vane_count) * 2.0 * 3.14159;
 			float paintable_area = 0.95 * ((WINDOW_SIZE) / 2.0 - annulus);
-			float m = annulus + pixel / ((float)pixel_count) * paintable_area;
+			float m = annulus + (pixel_count - pixel) / ((float)pixel_count) * paintable_area;
 			angle.at<float>(vane, pixel) = a;
 			magnitude.at<float>(vane, pixel) = m;
 			

@@ -9,6 +9,7 @@ import argparse
 
 import bands
 import noise
+from screens import chaos
 import theano_examples
 import skyscreen_core.memmap_interface
 import skyscreen_core.interface
@@ -44,6 +45,8 @@ def main():
 		theano_examples.theano_radar(writer, lock)
 	elif args.name == 'theano.droplet':
 		theano_examples.theano_droplet(writer, lock)
+	elif args.name == 'chaos':
+		chaos.chaos(writer, lock)
 	else:
 		logging.error('Unknown name "%s"', args.name)
 		sys.exit(1)

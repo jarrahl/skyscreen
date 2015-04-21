@@ -30,6 +30,10 @@ package{"libopencv-dev":
 	ensure => "installed",
 	require => Exec['apt-get update'],
 }
+package{"python-opencv":
+	ensure => "installed",
+	require => Exec['apt-get update'],
+}
 package{"build-essential":
 	ensure => "installed",
 	require => Exec['apt-get update'],
@@ -85,13 +89,6 @@ python::pip{"nose":
 }
 python::pip{"numpy":
 	pkgname => "numpy",
-	ensure => "present",
-	virtualenv => $venv,
-	owner => $user,
-	require => Exec["virtualenv --system-site-packages ${venv}"],
-}
-python::pip{"theano":
-	pkgname => "theano",
 	ensure => "present",
 	virtualenv => $venv,
 	owner => $user,
