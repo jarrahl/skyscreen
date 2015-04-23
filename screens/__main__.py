@@ -11,6 +11,7 @@ import bands
 import noise
 from screens import chaos
 import theano_examples
+import fsm
 import skyscreen_core.memmap_interface
 import skyscreen_core.interface
 
@@ -47,6 +48,8 @@ def main():
 		theano_examples.theano_droplet(writer, lock)
 	elif args.name == 'chaos':
 		chaos.chaos(writer, lock)
+	elif args.name == 'fsm.rps':
+		fsm.rps(writer, lock)
 	else:
 		logging.error('Unknown name "%s"', args.name)
 		sys.exit(1)

@@ -29,7 +29,7 @@ class NPMMAPScreenWriter(BaseMMapInterface, skyscreen_core.interface.ScreenWrite
 
 	def initialize_file(self):
 		array = np.memmap(self.shared_file,
-						  dtype=np.byte,
+						  dtype='uint8',
 						  mode='w+',
 						  shape=(self.screen_vane_count*self.screen_vane_length*3))
 		return array
@@ -37,7 +37,7 @@ class NPMMAPScreenWriter(BaseMMapInterface, skyscreen_core.interface.ScreenWrite
 	def __enter__(self):
 		assert self.shared_memory is None, 'cannot open shared mem twice'
 		self.shared_memory = np.memmap(self.shared_file,
-						  dtype=np.byte,
+						  dtype='uint8',
 						  mode='w+',
 						  shape=(self.screen_vane_count*self.screen_vane_length*3))
 		return self.shared_memory
@@ -48,7 +48,7 @@ class NPMMAPScreenReader(BaseMMapInterface, skyscreen_core.interface.ScreenWrite
 
 	def initialize_file(self):
 		array = np.memmap(self.shared_file,
-						  dtype=np.byte,
+						  dtype='uint8',
 						  mode='r',
 						  shape=(self.screen_vane_count*self.screen_vane_length*3))
 		return array
