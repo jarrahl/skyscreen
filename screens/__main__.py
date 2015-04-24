@@ -32,6 +32,7 @@ def main():
 
 	writer = skyscreen_core.memmap_interface.NPMMAPScreenWriter(shared_file)
 	lock = skyscreen_core.interface.FlockWriterSync(shared_file)
+	#lock = skyscreen_core.interface.DummyWriterSync()
 	if args.name == 'noise':
 		noise.noise(writer, lock)
 	elif args.name == 'bands':
@@ -50,6 +51,8 @@ def main():
 		chaos.chaos(writer, lock)
 	elif args.name == 'fsm.rps':
 		fsm.rps(writer, lock)
+	elif args.name == 'fsm.gol':
+		fsm.game_of_life(writer, lock)
 	else:
 		logging.error('Unknown name "%s"', args.name)
 		sys.exit(1)

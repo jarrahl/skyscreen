@@ -15,8 +15,8 @@ def numpy_random(writer, lock):
 
 def noise(writer, lock):
 	with writer as writer_buf:
+		lock.frame_ready()
 		while True:
-			lock.frame_ready()
 			print '.',; sys.stdout.flush()
 			for vane in xrange(Screen.screen_vane_count):
 				for pixel in xrange(Screen.screen_vane_length):
