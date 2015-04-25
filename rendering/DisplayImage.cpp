@@ -26,10 +26,8 @@ void lock_frame(int lock_method, int fd, void* zmq_resp) {
 	if (lock_method == FILE_LOCK)
 		flock(fd, LOCK_EX);
 	if (lock_method == ZMQ_LOCK) {
-		printf("awaiting data\n");
 		char buffer[10];
 		zmq_recv (zmq_resp, buffer, 10, 0);
-		printf("receieved data\n");
 	}
 }
 
@@ -117,12 +115,12 @@ int main(int argc, char** argv )
 			if (maxy < y_coords.at<float>(vane, pixel)) maxy = y_coords.at<float>(vane, pixel);
 		}
 	}
-	printf("%f\n", maxmag);
-	printf("%f\n", minmag);
-	printf("%f\n", maxx);
-	printf("%f\n", minx);
-	printf("%f\n", maxy);
-	printf("%f\n", miny);
+	//printf("%f\n", maxmag);
+	//printf("%f\n", minmag);
+	//printf("%f\n", maxx);
+	//printf("%f\n", minx);
+	//printf("%f\n", maxy);
+	//printf("%f\n", miny);
 
 	namedWindow(WINDOW_NAME, WINDOW_AUTOSIZE);
 	char k = -1;

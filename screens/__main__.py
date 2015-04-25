@@ -40,7 +40,6 @@ def main():
 	parser.add_argument('name', help='The name of the program to run')
 	args = parser.parse_args()
 
-
 	pid = os.fork()
 	if pid != 0:
 		run_displayimage(shared_file.name, pid)
@@ -68,8 +67,10 @@ def main():
 		chaos.chaos(writer, lock)
 	elif args.name == 'fsm.rps':
 		fsm.rps(writer, lock)
-	elif args.name == 'fsm.gol':
-		fsm.game_of_life(writer, lock)
+	elif args.name == 'fsm.random_game':
+		fsm.game_of_life(writer, lock, sub_prog='random')
+	elif args.name == 'fsm.gliders':
+		fsm.game_of_life(writer, lock, sub_prog='gliders')
 	else:
 		logging.error('Unknown name "%s"', args.name)
 		sys.exit(1)
