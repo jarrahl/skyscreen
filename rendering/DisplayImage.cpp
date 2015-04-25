@@ -3,6 +3,7 @@
 #include <sys/mman.h>
 #include <opencv2/opencv.hpp>
 #include <sys/file.h>
+#include <zmq.h>
 #include <stdlib.h>     /* getenv */
 
 using namespace cv;
@@ -18,6 +19,27 @@ int max(int i, int j) {
 	else return j;
 }
 
+#define FILE_LOCK 0
+#define ZMQ_LOCK 1
+
+void lock_frame(int lock_method, int fd, void* zmq_resp) {
+	if (lock_method == FILE_LOCK)
+		flock(fd, LOCK_EX);
+	if (lock_method == ZMQ_LOCK) {
+		printf("awaiting data\n");
+		char buffer[10];
+		zmq_recv (zmq_resp, buffer, 10, 0);
+		printf("receieved data\n");
+	}
+}
+
+void unlock_frame(int lock_method, int fd, void* zmq_resp) {
+	if (lock_method == FILE_LOCK)
+		flock(fd, LOCK_UN);
+	if (lock_method == ZMQ_LOCK) {
+		 zmq_send (zmq_resp, "UNLOCK", 6, 0);
+	}
+}
 
 int main(int argc, char** argv )
 {
@@ -38,6 +60,21 @@ int main(int argc, char** argv )
 		printf("Open file %s failed\n", filePath);
 		exit(1);
 	}
+	char* lock_method_name = getenv ("LOCK_METHOD");
+	int lock_method = 0;
+	void *zmq_context;
+    void *zmq_resp;
+	if (lock_method_name == NULL || strcmp(lock_method_name, "file") == 0) {
+		lock_method = FILE_LOCK;
+	} else {
+		printf("USING ZMQ LOCKING\n");
+		zmq_context = zmq_ctx_new();
+		zmq_resp = zmq_socket (zmq_context, ZMQ_REP);
+		int rc = zmq_bind (zmq_resp, "tcp://*:5555");
+		assert (rc == 0);
+		lock_method = ZMQ_LOCK;
+	}
+
 
 	const unsigned char* data_array = (unsigned char *)mmap(NULL,
 		array_size*sizeof(unsigned char), 
@@ -93,7 +130,7 @@ int main(int argc, char** argv )
 		imshow(WINDOW_NAME, A);
 		if (writer) writer->write(A);
 		k = waitKey(1);
-		flock(fd, LOCK_EX);
+		lock_frame(lock_method, fd, zmq_resp);
 		for (int vane = 0; vane < vane_count; vane++) {
 			for (int pixel = 0; pixel < pixel_count; pixel++) {
 				int x = (WINDOW_SIZE/2) + (int)x_coords.at<float>(vane, pixel);
@@ -127,7 +164,7 @@ int main(int argc, char** argv )
 				A.at<char>(x, y*3+2-3) = r;
 			}
 		}
-		flock(fd, LOCK_UN);
+		unlock_frame(lock_method, fd, zmq_resp);
 	}
 	return 0;
 }

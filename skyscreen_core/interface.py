@@ -86,3 +86,18 @@ class FlockWriterSync(WriterSync):
 		logging.info('re-locking %s', self.lock_file)
 		fcntl.flock(self.lock_handle, fcntl.LOCK_EX)
 		logging.info('Locked %s', self.lock_file)
+
+import zmq
+
+class ZMQWriterSync(WriterSync):
+	def __init__(self, port=5555):
+		self.context = zmq.Context()
+		self.socket = self.context.socket(zmq.REQ)
+		self.socket.connect("tcp://127.0.0.1:%d" % port)
+
+	def frame_ready(self):
+		logging.info('Sending ready message')
+		self.socket.send(b'ready')
+		logging.info('Awaiting done message')
+		self.socket.recv()
+		logging.info('Finished')

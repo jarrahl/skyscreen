@@ -1,6 +1,7 @@
 """
 Here are some simple example screens. Nothing too fancy.
 """
+from collections import namedtuple
 
 import logging
 import os
@@ -24,6 +25,7 @@ TARGET_FPS=25
 def run_displayimage(shared_path, python_proc):
 	new_env = dict(os.environ.items())
 	new_env['WRITER_FILE'] = shared_path
+	new_env['LOCK_METHOD'] = 'zmq'
 	display = subprocess.Popen('rendering/DisplayImage', env=new_env)
 	display.wait()
 	os.kill(python_proc, signal.SIGKILL)
@@ -31,19 +33,22 @@ def run_displayimage(shared_path, python_proc):
 
 def main():
 	shared_file = tempfile.NamedTemporaryFile()
+	SF = namedtuple('SF', ['name'])
+	#shared_file = SF(name='rendering/foo')
 
 	parser = argparse.ArgumentParser(usage='name options: noise, bands')
 	parser.add_argument('name', help='The name of the program to run')
 	args = parser.parse_args()
 
-	writer = skyscreen_core.memmap_interface.NPMMAPScreenWriter(shared_file.name)
-	lock = skyscreen_core.interface.FlockWriterSync(shared_file.name)
-	#lock = skyscreen_core.interface.DummyWriterSync()
 
 	pid = os.fork()
 	if pid != 0:
 		run_displayimage(shared_file.name, pid)
 		exit(0)
+	writer = skyscreen_core.memmap_interface.NPMMAPScreenWriter(shared_file.name)
+	#lock = skyscreen_core.interface.FlockWriterSync(shared_file.name)
+	#lock = skyscreen_core.interface.DummyWriterSync()
+	lock = skyscreen_core.interface.ZMQWriterSync()
 
 	if args.name == 'noise':
 		noise.noise(writer, lock)
