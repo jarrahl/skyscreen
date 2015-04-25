@@ -6,6 +6,9 @@ import logging
 import os
 import sys
 import argparse
+import tempfile
+import subprocess
+import signal
 
 import bands
 import noise
@@ -18,21 +21,30 @@ import skyscreen_core.interface
 
 TARGET_FPS=25
 
+def run_displayimage(shared_path, python_proc):
+	new_env = dict(os.environ.items())
+	new_env['WRITER_FILE'] = shared_path
+	display = subprocess.Popen('rendering/DisplayImage', env=new_env)
+	display.wait()
+	os.kill(python_proc, signal.SIGKILL)
+	os.waitpid(python_proc, 0)
 
 def main():
-	try:
-		shared_file = os.environ['WRITER_FILE']
-	except KeyError:
-		print 'You must pass the shared file as WRITER_FILE env variable'
-		sys.exit(1)
+	shared_file = tempfile.NamedTemporaryFile()
 
 	parser = argparse.ArgumentParser(usage='name options: noise, bands')
 	parser.add_argument('name', help='The name of the program to run')
 	args = parser.parse_args()
 
-	writer = skyscreen_core.memmap_interface.NPMMAPScreenWriter(shared_file)
-	lock = skyscreen_core.interface.FlockWriterSync(shared_file)
+	writer = skyscreen_core.memmap_interface.NPMMAPScreenWriter(shared_file.name)
+	lock = skyscreen_core.interface.FlockWriterSync(shared_file.name)
 	#lock = skyscreen_core.interface.DummyWriterSync()
+
+	pid = os.fork()
+	if pid != 0:
+		run_displayimage(shared_file.name, pid)
+		exit(0)
+
 	if args.name == 'noise':
 		noise.noise(writer, lock)
 	elif args.name == 'bands':

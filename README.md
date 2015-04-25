@@ -60,15 +60,17 @@ You can test this pretty easily - just run:
     
 And they should all pass, although they'll spam the screen with some pygame windows.
 
-To run it, you've got a few options. The number one option is to use the rendering system in the rendering directory:
 
-    cd rendering; WRITER_FILE=foo ./DisplayImage
+There are a few ways to run it. The easiest is simply:
 
-This will use the file 'foo' in the CWD as the mmap region. Once you've started this process, you can
-start your own code to write to that region. You'll need to do this in another term though, because the 
-display must continue to run:
+    python -m screens noise
     
-    # also remmeber to activate the new window's python env
-    WRITER_FILE=rendering/foo python -m screens noise
+This will fork a DisplayImage process, and when you exit the image, it'll exit the python code as well.
+
+If you're getting complicated, you may want to start DisplayImage manually, by calling:
+
+    cd rendering;
+    WRITER_FILE=rendering/foo ./DisplayImage
     
-Once you're finished, just kill the processes.
+and then starting your pattern generator somewhere else. 
+
