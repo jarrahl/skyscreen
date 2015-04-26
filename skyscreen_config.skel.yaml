@@ -1,0 +1,4 @@
+vane_count: 360
+vane_size: 288
+default_lock: zmq
+log_level: WARNING

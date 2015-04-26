@@ -36,6 +36,9 @@ class NPMMAPScreenWriter(BaseMMapInterface, skyscreen_core.interface.ScreenWrite
 						  shape=(self.screen_vane_count*self.screen_vane_length*3))
 		return self.shared_memory
 
+	def __exit__(self, exc_type, exc_val, exc_tb):
+		del self.shared_memory # This closes the file
+
 	def frame_ready(self):
 		self.lock.frame_ready()
 
@@ -56,6 +59,9 @@ class NPMMAPScreenReader(BaseMMapInterface, skyscreen_core.interface.ScreenWrite
 		assert self.shared_memory is None, 'cannot open shared mem twice'
 		self.shared_memory = self.initialize_file()
 		return self.shared_memory
+
+	def __exit__(self, exc_type, exc_val, exc_tb):
+		del self.shared_memory # This closes the file
 
 	def start_read(self):
 		self.lock.start_read()

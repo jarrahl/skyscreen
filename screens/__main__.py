@@ -27,15 +27,16 @@ def run_displayimage(shared_path, python_proc):
 	new_env = dict(os.environ.items())
 	new_env['WRITER_FILE'] = shared_path
 	new_env['LOCK_METHOD'] = 'zmq'
-	display = subprocess.Popen('rendering/DisplayImage', env=new_env)
+	#display = subprocess.Popen('rendering/DisplayImage', env=new_env)
+	display = subprocess.Popen(['python', 'pyrendering/render.py', shared_path], env=new_env)
 	display.wait()
 	os.kill(python_proc, signal.SIGKILL)
 	os.waitpid(python_proc, 0)
 
 def main():
-	shared_file = tempfile.NamedTemporaryFile()
+	#shared_file = tempfile.NamedTemporaryFile()
 	SF = namedtuple('SF', ['name'])
-	#shared_file = SF(name='rendering/foo')
+	shared_file = SF(name='rendering/foo')
 
 	parser = argparse.ArgumentParser(usage='name options: noise, bands')
 	parser.add_argument('name', help='The name of the program to run')

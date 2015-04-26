@@ -1,4 +1,5 @@
-from distutils.core import setup
+#from distutils.core import setup
+from setuptools import setup
 from Cython.Build import cythonize
 
 setup(name='Skyscreen',
@@ -11,5 +12,14 @@ setup(name='Skyscreen',
             'skyscreen_tools',
             'skyscreen_core',
             'screens'],
+      requires=[
+            'numpy',
+            'theano',
+            'cython',
+            'nose',
+            'pyzmq',
+            'plumbum',
+            'scales'
+      ],
       ext_modules=cythonize("skyscreen_tools/flatspace_tools.pyx")
 )

@@ -112,3 +112,10 @@ python::pip{"cython":
 	owner => $user,
 	require => Exec["virtualenv --system-site-packages ${venv}"],
 }
+python::pip{"plumbum":
+	pkgname => "plumbum",
+	ensure => "present",
+	virtualenv => $venv,
+	owner => $user,
+	require => Exec["virtualenv --system-site-packages ${venv}"],
+}

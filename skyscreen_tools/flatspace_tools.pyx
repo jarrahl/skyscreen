@@ -23,9 +23,6 @@ def polar_remap(np.ndarray[np.uint8_t, ndim = 3] input, np.ndarray[np.uint8_t, n
 			output[angle, mag, 1] = g
 			b = input[row, col, 2]
 			output[angle, mag, 2] = b
-			#output[angle, mag, 0] = input[angle, mag, 0]
-			#output[angle, mag, 1] = input[angle, mag, 1]
-			#output[angle, mag, 2] = input[angle, mag, 2]
 
 # A wrapper for the c_polar_coord_transform below.
 def polar_coord_transform(mag, angle):
@@ -41,3 +38,4 @@ cdef (int, int)c_polar_coord_transform(int mag, int angle):
 	row = <int>round(d_mag * sin(d_angle/360.0 * 2.0 * 3.14159265)) # Like Y
 	col = <int>round(d_mag * cos(d_angle/360.0 * 2.0 * 3.14159265)) # Like X
 	return row, col
+

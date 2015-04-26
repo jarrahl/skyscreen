@@ -95,14 +95,17 @@ class SemaphoreReaderSync(ReaderSync):
 
 
 class DummyWriterSync(WriterSync):
+	def __init__(self):
+		logging.warning('A dummy WriterSync is being used. Sync calls do nothing')
 	def frame_ready(self):
-		logging.warning('A dummy writer sync is being used, frame_ready calls do nothing')
-
+		pass
 class DummyReaderSync(WriterSync):
-	def start_reakd(self):
-		logging.warning('A dummy reader is being used, start_read calls do nothing')
+	def __init__(self):
+		logging.warning('A dummy WriterSync is being used. Sync calls do nothing')
+	def start_read(self):
+		pass
 	def finish_read(self):
-		logging.warning('A dummy reader is being used, finish_read calls do nothing')
+		pass
 
 
 class FlockWriterSync(WriterSync):
@@ -133,3 +136,15 @@ class ZMQWriterSync(WriterSync):
 		logging.info('Awaiting done message')
 		self.socket.recv()
 		logging.info('Finished')
+
+class ZMQReaderSync(ReaderSync):
+	def __init__(self, port=5555):
+		self.context = zmq.Context()
+		self.socket = self.context.socket(zmq.REP)
+		self.socket.bind("tcp://127.0.0.1:%d" % port)
+
+	def start_read(self):
+		self.socket.recv()
+
+	def finish_read(self):
+		self.socket.send('Done')
