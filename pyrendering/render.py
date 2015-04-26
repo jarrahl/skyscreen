@@ -5,7 +5,9 @@ from greplin import scales
 import skyscreen_core.interface as interface
 import skyscreen_core.memmap_interface
 import skyscreen_tools.reshape_wrapper
-import pyximport; pyximport.install()
+import pyximport;
+
+pyximport.install()
 import pyrendering.fast_tools
 
 
@@ -38,9 +40,9 @@ class MainRender(cli.Application):
 											float(interface.Screen.screen_vane_length) * paintable_area
 				angles[angle, mag] = render_angle
 				magnitudes[angle, mag] = render_mag
-			cols, rows = cv2.polarToCart(magnitudes, angles)
-		cols = (cols + self.window_size/2).astype(np.int32)
-		rows = (rows + self.window_size/2).astype(np.int32)
+		cols, rows = cv2.polarToCart(magnitudes, angles)
+		cols = np.round((cols + self.window_size / 2)).astype(np.int32)
+		rows = np.round((rows + self.window_size / 2)).astype(np.int32)
 
 		return cols, rows
 
@@ -56,15 +58,25 @@ class MainRender(cli.Application):
 
 		create_windows()
 		with reader as reader_buf:
+			bgr_fixed = np.zeros(reader_buf.shape, dtype=np.uint8)
+
 			while True:
+				# Fix up BGR color, turn it to RGB
+				# This also means we copy in the image, so we can
+				# hand back to the render ASAP.
 				reader.start_read()
-				cv2.resize(reader_buf, (self.window_size, self.window_size), raw_image)
-				pyrendering.fast_tools.quickblit(reader_buf,
-												 polar_image,
-												 rows, cols)
+				bgr_fixed[:, :, 0] = reader_buf[:, :, 2]
+				bgr_fixed[:, :, 1] = reader_buf[:, :, 1]
+				bgr_fixed[:, :, 2] = reader_buf[:, :, 0]
+				reader.finish_read()
+				cv2.resize(bgr_fixed, (self.window_size, self.window_size), raw_image)
+				pyrendering.fast_tools.quickblit(
+					bgr_fixed,
+					polar_image,
+					rows,
+					cols)
 				cv2.imshow('raw_image', raw_image)
 				cv2.imshow('image', polar_image)
-				reader.finish_read()
 				char = cv2.waitKey(1)
 				if char != -1:
 					break

@@ -6,6 +6,18 @@ from screens import fsm
 from skyscreen_core.interface import Screen
 import skyscreen_tools.flatspace
 import numpy as np
+from skyscreen_tools.reshape_wrapper import ReshapingWriterWrapper
+
+
+def grid(writer):
+	reshaped = ReshapingWriterWrapper(writer)
+	with reshaped as writer_buf:
+		for i in range(0, Screen.screen_vane_count, 20):
+			writer_buf[i, :, 0] = 255
+		for i in range(0, Screen.screen_vane_length, 20):
+			writer_buf[:, i, 1] = 255
+		while True:
+			reshaped.frame_ready()
 
 def simple_lines(writer):
 	#with writer as writer_buf:
@@ -33,7 +45,6 @@ def simple_lines(writer):
 			rn = min((step+50) % flatspace_buf.shape[0], flatspace_buf.shape[0])
 			c = step % flatspace_buf.shape[1]
 			cn = min((step+50) % flatspace_buf.shape[1], flatspace_buf.shape[1])
-			print c
 
 			flatspace_buf[r, :, 0] = 0
 			flatspace_buf[:, c, 1] = 0

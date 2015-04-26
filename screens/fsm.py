@@ -122,7 +122,7 @@ def game_of_life(writer, sub_prog='random'):
 			game_of_life_channel(gol_arr_g)
 			game_of_life_channel(gol_arr_b)
 			game_of_life_channel(gol_arr_d)
-			if np.random.random() < 0.2:
+			if np.random.random() < 0.2 and sub_prog == 'random':
 				random_spawn(gol_arr_r)
 				random_spawn(gol_arr_g)
 				random_spawn(gol_arr_b)
