@@ -1,4 +1,4 @@
-import screens
+import patterns
 from plumbum import cli
 
 names = [
@@ -38,10 +38,10 @@ class Runner(cli.Application):
 				print "\t%s" % name
 			return 0
 		if name:
-			screens.run_named(name)
+			patterns.run_named(name)
 		else:
 			for name in names:
-				screens.run_named(name)
+				patterns.run_named(name)
 		return 0
 
 

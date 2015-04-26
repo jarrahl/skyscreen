@@ -1,8 +1,8 @@
 """
 This is to test out flatspace tools.
 """
-from screens.fsm import game_of_life_channel, random_spawn
-from screens import fsm
+from patterns.fsm import game_of_life_channel, random_spawn
+from patterns import fsm
 from skyscreen_core.interface import Screen
 import skyscreen_tools.flatspace
 import numpy as np
