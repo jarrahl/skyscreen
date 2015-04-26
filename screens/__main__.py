@@ -45,35 +45,35 @@ def main():
 	if pid != 0:
 		run_displayimage(shared_file.name, pid)
 		exit(0)
-	writer = skyscreen_core.memmap_interface.NPMMAPScreenWriter(shared_file.name)
 	#lock = skyscreen_core.interface.FlockWriterSync(shared_file.name)
 	#lock = skyscreen_core.interface.DummyWriterSync()
 	lock = skyscreen_core.interface.ZMQWriterSync()
+	writer = skyscreen_core.memmap_interface.NPMMAPScreenWriter(shared_file.name, lock)
 
 	if args.name == 'noise':
-		noise.noise(writer, lock)
+		noise.noise(writer)
 	elif args.name == 'bands':
-		bands.bands(writer, lock)
+		bands.bands(writer)
 	elif args.name == 'npnoise':
-		noise.numpy_random(writer, lock)
+		noise.numpy_random(writer)
 	elif args.name == 'theano.swirl':
-		theano_examples.theano_swirl(writer, lock)
+		theano_examples.theano_swirl(writer)
 	elif args.name == 'theano.tripdar':
-		theano_examples.theano_tripdar(writer, lock)
+		theano_examples.theano_tripdar(writer)
 	elif args.name == 'theano.radar':
-		theano_examples.theano_radar(writer, lock)
+		theano_examples.theano_radar(writer)
 	elif args.name == 'theano.droplet':
-		theano_examples.theano_droplet(writer, lock)
+		theano_examples.theano_droplet(writer)
 	elif args.name == 'chaos':
-		chaos.chaos(writer, lock)
+		chaos.chaos(writer)
 	elif args.name == 'fsm.rps':
-		fsm.rps(writer, lock)
+		fsm.rps(writer)
 	elif args.name == 'fsm.random_game':
-		fsm.game_of_life(writer, lock, sub_prog='random')
+		fsm.game_of_life(writer, sub_prog='random')
 	elif args.name == 'fsm.gliders':
-		fsm.game_of_life(writer, lock, sub_prog='gliders')
+		fsm.game_of_life(writer, sub_prog='gliders')
 	elif args.name == 'lines':
-		screens.simple_lines.simple_lines(writer, lock)
+		screens.simple_lines.simple_lines(writer)
 	else:
 		logging.error('Unknown name "%s"', args.name)
 		sys.exit(1)

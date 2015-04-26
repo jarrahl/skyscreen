@@ -39,6 +39,9 @@ class ScreenWriter(Screen):
 	def __exit__(self, type, value, traceback):
 		raise NotImplementedError()
 
+	def frame_ready(self):
+		raise NotImplementedError()
+
 
 class ScreenReader(Screen):
 	def __enter__(self):
@@ -50,6 +53,13 @@ class ScreenReader(Screen):
 	def __exit__(self, type, value, traceback):
 		raise NotImplementedError()
 
+	def start_read(self):
+		raise NotImplementedError()
+
+	def finish_read(self):
+		raise NotImplementedError()
+
+
 class WriterSync(object):
 	def frame_ready(self):
 		raise NotImplementedError()
@@ -60,6 +70,28 @@ class ReaderSync(object):
 		raise NotImplementedError()
 	def finish_read(self):
 		raise NotImplementedError()
+
+class SemaphoreWriterSync(WriterSync):
+	def __init__(self, sem):
+		self.sem = sem
+		assert sem.acquire(blocking=False), \
+			'The semaphore must be acquire-able'
+		sem.acquire()
+
+	def frame_ready(self):
+		self.sem.release()
+		self.sem.acquire()
+
+class SemaphoreReaderSync(ReaderSync):
+	def __init__(self, sem):
+		self.sem = sem
+		assert not sem.acquire(blocking=False), \
+			'The semaphore should be acquired by the reader'
+	def start_read(self):
+		self.sem.acquire()
+
+	def finish_read(self):
+		self.sem.release()
 
 
 class DummyWriterSync(WriterSync):

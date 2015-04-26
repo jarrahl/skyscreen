@@ -2,7 +2,7 @@ import numpy as np
 from skyscreen_core.interface import Screen
 
 
-def chaos(writer, lock):
+def chaos(writer):
 	with writer as writer_buf:
 		writer_buf_reshaped = writer_buf.reshape((Screen.screen_vane_count, Screen.screen_vane_length, 3))
 		row = 0.5
@@ -19,4 +19,4 @@ def chaos(writer, lock):
 			col = (row + col) % Screen.screen_vane_length
 			color = (row * Screen.screen_vane_count) % 3
 			writer_buf_reshaped[:, :, color] = np.floor(floating_version)
-			lock.frame_ready()
+			writer.frame_ready()

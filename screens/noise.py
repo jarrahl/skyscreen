@@ -6,17 +6,17 @@ import numpy as np
 from skyscreen_core.interface import Screen, pixel_vane_mapping, FlockWriterSync
 
 
-def numpy_random(writer, lock):
+def numpy_random(writer):
 	with writer as writer_buf:
 		while True:
-			lock.frame_ready()
+			writer.frame_ready()
 			writer_buf[:] = 255*np.random.random(size=writer_buf.shape)
 			writer_buf.flush()
 
-def noise(writer, lock):
+def noise(writer):
 	with writer as writer_buf:
-		lock.frame_ready()
 		while True:
+			writer.frame_ready()
 			print '.',; sys.stdout.flush()
 			for vane in xrange(Screen.screen_vane_count):
 				for pixel in xrange(Screen.screen_vane_length):

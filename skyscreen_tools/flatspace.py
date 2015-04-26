@@ -2,6 +2,7 @@
 transform the polar coordinates into cartesian ones.
 """
 import logging
+import skyscreen_core
 from skyscreen_core.interface import Screen
 import numpy as np
 import pyximport; pyximport.install()
@@ -12,9 +13,8 @@ n_screen_rows = Screen.screen_vane_count
 n_screen_cols = Screen.screen_vane_count
 
 
-class FlatSpaceTransform(object):
-	def __init__(self, writer, lock):
-		self.lock = lock
+class FlatSpaceTransform(skyscreen_core.interface.ScreenWriter):
+	def __init__(self, writer):
 		self.writer = writer
 		self.screen_buffer = None
 
@@ -31,7 +31,7 @@ class FlatSpaceTransform(object):
 
 	def frame_ready(self):
 		quickcopy_buffer(self.screen_buffer, self.writer_buf_resized)
-		self.lock.frame_ready()
+		self.writer.frame_ready()
 
 
 def quickcopy_buffer(input, output):

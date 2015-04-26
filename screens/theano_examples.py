@@ -11,7 +11,7 @@ TARGET_FPS = 25
 from skyscreen_core.interface import Screen
 
 
-def theano_scan(writer, lock, draw_fn):
+def theano_scan(writer, draw_fn):
 	with writer as writer_buf:
 		writer_buf_reshaped = writer_buf.reshape((Screen.screen_vane_count, Screen.screen_vane_length, 3))
 		vane_matrix = [[[vane, vane, vane] for px in range(Screen.screen_vane_length)]
@@ -29,7 +29,7 @@ def theano_scan(writer, lock, draw_fn):
 
 		step_actual = 0
 		while True:
-			lock.frame_ready()
+			writer.frame_ready()
 			start = time.time()
 			writer_buf_reshaped[:] = fn_actual(step_actual)
 			step_actual -= 1
@@ -39,7 +39,7 @@ def theano_scan(writer, lock, draw_fn):
 				logging.warning('Frame rate is %f, which is lower than target %d', fps, TARGET_FPS)
 			time.sleep(0.01)
 
-def theano_scan_color(writer, lock, draw_fn):
+def theano_scan_color(writer, draw_fn):
 	with writer as writer_buf:
 		writer_buf_reshaped = writer_buf.reshape((Screen.screen_vane_count, Screen.screen_vane_length, 3))
 		vane_matrix = [[[float(vane), float(vane), float(vane)] for px in range(Screen.screen_vane_length)]
@@ -60,7 +60,7 @@ def theano_scan_color(writer, lock, draw_fn):
 
 		step_actual = 0
 		while True:
-			lock.frame_ready()
+			writer.frame_ready()
 			start = time.time()
 			writer_buf_reshaped[:] = fn_actual(step_actual)
 			step_actual -= 1
@@ -69,14 +69,14 @@ def theano_scan_color(writer, lock, draw_fn):
 			if fps < TARGET_FPS:
 				logging.warning('Frame rate is %f, which is lower than target %d', fps, TARGET_FPS)
 
-def theano_swirl(writer, lock):
+def theano_swirl(writer):
 	def theano_fn(step):
 		def draw(vane, px):
 			return 127*T.sin((vane+px/2+step)/40.0) + 127*T.sin((vane+px/2+step*1.3)/40.0)
 		return draw
-	theano_scan(writer, lock, theano_fn)
+	theano_scan(writer, theano_fn)
 
-def theano_tripdar(writer, lock):
+def theano_tripdar(writer):
 	def theano_fn(step):
 		def draw(vane, px):
 			vane_expr = vane / float(Screen.screen_vane_count) * 3.141
@@ -84,9 +84,9 @@ def theano_tripdar(writer, lock):
 			step_expr = step
 			return 255*T.sin(vane_expr + step_expr/50)*T.sin(px_expr + step_expr/50)
 		return draw
-	theano_scan(writer, lock, theano_fn)
+	theano_scan(writer, theano_fn)
 
-def theano_radar(writer, lock):
+def theano_radar(writer):
 	def theano_fn(step):
 		def draw(vane, px, col):
 			radar_vane = (step % Screen.screen_vane_count)
@@ -95,14 +95,14 @@ def theano_radar(writer, lock):
 
 			return T.clip(vane_expr, 0, 255)
 		return draw
-	theano_scan_color(writer, lock, theano_fn)
+	theano_scan_color(writer, theano_fn)
 
-def theano_droplet(writer, lock):
+def theano_droplet(writer):
 	def theano_fn(step):
 		def draw(vane, px, col):
 			ring = Screen.screen_vane_length-(step/3 % Screen.screen_vane_length)
 			ring_dist = T.maximum(0, float(Screen.screen_vane_length)/(ring-px))
 			return T.clip(ring_dist, 0, 255)
 		return draw
-	theano_scan_color(writer, lock, theano_fn)
+	theano_scan_color(writer, theano_fn)
 

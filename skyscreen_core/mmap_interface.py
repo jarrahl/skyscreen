@@ -30,8 +30,9 @@ class BaseMMapInterface(object):
 class MMAPScreenWriter(BaseMMapInterface, skyscreen_core.interface.ScreenWriter):
 	file_mode = os.O_CREAT | os.O_RDWR
 
-	def __init__(self, shared_file):
+	def __init__(self, shared_file, lock):
 		super(MMAPScreenWriter, self).__init__(shared_file)
+		self.lock = lock
 
 	def initialize_file(self):
 		self.shared_handle = os.open(self.shared_file, self.file_mode)
@@ -44,11 +45,15 @@ class MMAPScreenWriter(BaseMMapInterface, skyscreen_core.interface.ScreenWriter)
 		self.shared_memory = mmap.mmap(self.shared_handle, self.array_size, mmap.MAP_SHARED, mmap.PROT_WRITE)
 		return self.shared_memory
 
+	def frame_ready(self):
+		self.lock.frame_read()
+
 class MMAPScreenReader(BaseMMapInterface, skyscreen_core.interface.ScreenReader):
 	file_mode = os.O_RDONLY
 
-	def __init__(self, shared_file):
+	def __init__(self, shared_file, lock):
 		super(MMAPScreenReader, self).__init__(shared_file)
+		self.lock = lock
 
 	def __enter__(self):
 		assert self.shared_memory is None, 'cannot open shared mem twice'
@@ -65,24 +70,8 @@ class MMAPScreenReader(BaseMMapInterface, skyscreen_core.interface.ScreenReader)
 		self.shared_memory = mmap.mmap(self.shared_handle, self.array_size, mmap.MAP_SHARED, mmap.PROT_READ)
 		return self.shared_memory
 
-class SemaphoreWriterSync(skyscreen_core.interface.WriterSync):
-	def __init__(self, sem):
-		self.sem = sem
-		assert sem.acquire(blocking=False),\
-			'The semaphore must be acquire-able'
-		sem.acquire()
-
-	def frame_ready(self):
-		self.sem.release()
-		self.sem.acquire()
-
-class SemaphoreReaderSync(skyscreen_core.interface.ReaderSync):
-	def __init__(self, sem):
-		self.sem = sem
-		assert not sem.acquire(blocking=False), \
-			'The semaphore should be acquired by the reader'
 	def start_read(self):
-		self.sem.acquire()
+		self.lock.start_read()
 
 	def finish_read(self):
-		self.sem.release()
+		self.lock.finish_read()

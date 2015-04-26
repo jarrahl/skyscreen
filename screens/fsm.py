@@ -4,7 +4,7 @@ import time
 from skyscreen_core.interface import Screen
 
 
-def rps(writer, lock):
+def rps(writer):
 	with writer as writer_buf:
 		writer_buf_reshaped = writer_buf.reshape((Screen.screen_vane_count, Screen.screen_vane_length, 3))
 		convolution_mat = np.array([
@@ -21,7 +21,7 @@ def rps(writer, lock):
 		b_score[:, 99] = 1.0
 
 		while True:
-			lock.frame_ready()
+			writer.frame_ready()
 
 			r_score += filters.convolve(r_score, convolution_mat)
 			print np.sum(r_score)
@@ -41,7 +41,7 @@ def game_of_life_channel(gol_arr):
 	downright = np.roll(right, 1, axis=0)
 	downleft = np.roll(right, -1, axis=0)
 
-	px_sums = np.zeros((Screen.screen_vane_count, Screen.screen_vane_length), dtype=np.byte)
+	px_sums = np.zeros(gol_arr.shape, dtype=np.byte)
 	px_sums += down
 	px_sums += up
 	px_sums += left
@@ -94,7 +94,7 @@ def random_spawn(gol_arr):
 	)
 
 
-def game_of_life(writer, lock, sub_prog='random'):
+def game_of_life(writer, sub_prog='random'):
 	with writer as writer_buf:
 		writer_buf_reshaped = writer_buf.reshape((Screen.screen_vane_count, Screen.screen_vane_length, 3))
 
@@ -136,4 +136,4 @@ def game_of_life(writer, lock, sub_prog='random'):
 			writer_buf_reshaped[:, :, 0] *= np.invert(gol_arr_d)
 			writer_buf_reshaped[:, :, 1] *= np.invert(gol_arr_d)
 			writer_buf_reshaped[:, :, 2] *= np.invert(gol_arr_d)
-			lock.frame_ready()
+			writer.frame_ready()

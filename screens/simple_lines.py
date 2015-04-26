@@ -1,11 +1,13 @@
 """
 This is to test out flatspace tools.
 """
+from screens.fsm import game_of_life_channel, random_spawn
+from screens import fsm
 from skyscreen_core.interface import Screen
 import skyscreen_tools.flatspace
 import numpy as np
 
-def simple_lines(writer, lock):
+def simple_lines(writer):
 	#with writer as writer_buf:
 	#	writer_buf_reshape = writer_buf.reshape((Screen.screen_vane_count, Screen.screen_vane_length, 3))
 	#	while True:
@@ -16,12 +18,12 @@ def simple_lines(writer, lock):
 	#		writer_buf_reshape[:, 100, 1] = 255
 	#		lock.frame_ready()
 
-	flatspace = skyscreen_tools.flatspace.FlatSpaceTransform(writer, lock)
+	flatspace = skyscreen_tools.flatspace.FlatSpaceTransform(writer)
 	with flatspace as flatspace_buf:
 		step = 0
 		space = np.resize(np.linspace(0, 254, Screen.screen_vane_count),
 						  (Screen.screen_vane_count, Screen.screen_vane_count))
-		while True:
+		while False:
 			flatspace_buf[:, :, 2] = space
 			flatspace_buf[:, :, 1] = space.T
 			flatspace_buf[:, :, 0] = 255*np.eye(Screen.screen_vane_count)
@@ -47,4 +49,3 @@ def simple_lines(writer, lock):
 			flatspace_buf[r:rn, c:cn, 2] = 255
 
 			flatspace.frame_ready()
-

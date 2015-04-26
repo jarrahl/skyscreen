@@ -9,8 +9,8 @@ import skyscreen_core.interface as intf
 
 
 cap = cv2.VideoCapture(sys.argv[1])
-writer = mm.NPMMAPScreenWriter("rendering/foo")
 lock = intf.FlockWriterSync("rendering/foo")
+writer = mm.NPMMAPScreenWriter("rendering/foo", lock)
 # Let's think about this logically.
 # We have a 144*4 by 144*4 box. We want to map
 # a region of that into polar coordinates. Step one:
@@ -44,7 +44,7 @@ with writer as writer_buf:
 		# 		buf[magn, angl, :] = subsample[row, col, :]
 
 
-		lock.frame_ready()
+		writer.frame_ready()
 		print "FRAME"
 print "Video finished, exiting"
 cap.release()
