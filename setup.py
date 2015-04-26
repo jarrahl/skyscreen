@@ -1,5 +1,5 @@
 from distutils.core import setup
-from setuptools import find_packages
+from Cython.Build import cythonize
 
 setup(name='Skyscreen',
       version='0.1',
@@ -7,5 +7,9 @@ setup(name='Skyscreen',
       author='Richard Weiss',
       author_email='richardweiss@richardweiss.org',
       url='https://www.python.org/sigs/distutils-sig/',
-      packages=find_packages()
+      packages=[
+            'skyscreen_tools',
+            'skyscreen_core',
+            'screens'],
+      ext_modules=cythonize("skyscreen_tools/flatspace_tools.pyx")
 )
