@@ -14,6 +14,7 @@ import signal
 import bands
 import noise
 from screens import chaos
+import screens.simple_lines
 import theano_examples
 import fsm
 import skyscreen_core.memmap_interface
@@ -71,6 +72,8 @@ def main():
 		fsm.game_of_life(writer, lock, sub_prog='random')
 	elif args.name == 'fsm.gliders':
 		fsm.game_of_life(writer, lock, sub_prog='gliders')
+	elif args.name == 'lines':
+		screens.simple_lines.simple_lines(writer, lock)
 	else:
 		logging.error('Unknown name "%s"', args.name)
 		sys.exit(1)
