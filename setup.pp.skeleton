@@ -105,3 +105,10 @@ python::pip{"pyzmq":
 	owner => $user,
 	require => Exec["virtualenv --system-site-packages ${venv}"],
 }
+python::pip{"cython":
+	pkgname => "cython",
+	ensure => "present",
+	virtualenv => $venv,
+	owner => $user,
+	require => Exec["virtualenv --system-site-packages ${venv}"],
+}
