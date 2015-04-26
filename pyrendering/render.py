@@ -65,7 +65,7 @@ class MainRender(cli.Application):
 				cv2.imshow('raw_image', raw_image)
 				cv2.imshow('image', polar_image)
 				reader.finish_read()
-				char = cv2.waitKey(10)
+				char = cv2.waitKey(1)
 				if char != -1:
 					break
 
