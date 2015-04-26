@@ -14,7 +14,7 @@ def grid(writer):
 	with reshaped as writer_buf:
 		for i in range(0, Screen.screen_vane_count, 20):
 			writer_buf[i, :, 0] = 255
-		for i in range(0, Screen.screen_vane_length, 20):
+		for i in range(0, Screen.screen_max_magnitude, 20):
 			writer_buf[:, i, 1] = 255
 		while True:
 			reshaped.frame_ready()

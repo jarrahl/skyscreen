@@ -19,11 +19,11 @@ rows = np.resize(np.linspace(-144, 144-1, 576), (576, 576)).T
 cols = np.resize(np.linspace(-144, 144-1, 576), (576, 576))
 # Then, we apply a transform to it to make it polar:
 mag, angle = cv2.cartToPolar(cols, rows)
-mag = np.clip(mag, 0, intf.Screen.screen_vane_length-1)
+mag = np.clip(mag, 0, intf.Screen.screen_max_magnitude-1)
 angle = np.clip(angle, 0, intf.Screen.screen_vane_count-1)
 
 with writer as writer_buf:
-	buf = writer_buf.reshape((intf.Screen.screen_vane_count, intf.Screen.screen_vane_length, 3))
+	buf = writer_buf.reshape((intf.Screen.screen_vane_count, intf.Screen.screen_max_magnitude, 3))
 	while 1:
 		ret, frame = cap.read()
 		if not ret:

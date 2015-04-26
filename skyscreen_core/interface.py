@@ -3,11 +3,11 @@ import os
 import fcntl
 
 class Screen(object):
-	screen_vane_length = 288
-	screen_rows = screen_vane_length
+	screen_max_magnitude = 288
+	screen_rows = screen_max_magnitude
 	screen_vane_count = 360
 	screen_cols = screen_vane_count
-	array_size = screen_vane_count * screen_vane_length * 3
+	array_size = screen_vane_count * screen_max_magnitude * 3
 
 chanmap = {
 	'r': 0,
@@ -16,7 +16,7 @@ chanmap = {
 }
 
 def pixel_vane_mapping(vane, pixel, channel):
-	return (vane * Screen.screen_vane_length * 3) + pixel * 3 + chanmap[channel]
+	return (vane * Screen.screen_max_magnitude * 3) + pixel * 3 + chanmap[channel]
 
 class ScreenBuffer(object):
 	"""An abstract screen buffer"""

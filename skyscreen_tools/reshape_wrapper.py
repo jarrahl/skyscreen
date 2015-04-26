@@ -7,7 +7,7 @@ class ReshapingWriterWrapper(core.ScreenWriter):
 
 	def __enter__(self):
 		self.buf = self.writer.__enter__()
-		return self.buf.reshape((core.Screen.screen_vane_count, core.Screen.screen_vane_length, 3))
+		return self.buf.reshape((core.Screen.screen_vane_count, core.Screen.screen_max_magnitude, 3))
 
 	def __exit__(self, type, value, traceback):
 		del self.buf
@@ -23,7 +23,7 @@ class ReshapingWriterReader(core.ScreenReader):
 
 	def __enter__(self):
 		self.buf = self.reader.__enter__()
-		return self.buf.reshape((core.Screen.screen_vane_count, core.Screen.screen_vane_length, 3))
+		return self.buf.reshape((core.Screen.screen_vane_count, core.Screen.screen_max_magnitude, 3))
 
 	def __exit__(self, type, value, traceback):
 		del self.buf

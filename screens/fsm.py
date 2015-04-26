@@ -6,16 +6,16 @@ from skyscreen_core.interface import Screen
 
 def rps(writer):
 	with writer as writer_buf:
-		writer_buf_reshaped = writer_buf.reshape((Screen.screen_vane_count, Screen.screen_vane_length, 3))
+		writer_buf_reshaped = writer_buf.reshape((Screen.screen_vane_count, Screen.screen_max_magnitude, 3))
 		convolution_mat = np.array([
 			[1, 0, 1],
 			[0, 0, 0],
 			[1, 0, 1],
 		]) / 8.0
 
-		r_score = np.zeros((Screen.screen_vane_count, Screen.screen_vane_length))
-		g_score = np.zeros((Screen.screen_vane_count, Screen.screen_vane_length))
-		b_score = np.zeros((Screen.screen_vane_count, Screen.screen_vane_length))
+		r_score = np.zeros((Screen.screen_vane_count, Screen.screen_max_magnitude))
+		g_score = np.zeros((Screen.screen_vane_count, Screen.screen_max_magnitude))
+		b_score = np.zeros((Screen.screen_vane_count, Screen.screen_max_magnitude))
 		r_score[:, 23] = 1.0
 		g_score[33, :] = 1.0
 		b_score[:, 99] = 1.0
@@ -80,14 +80,14 @@ def init_gliders(gol_arr):
 
 def init_random(gol_arr):
 	gol_arr[:] = np.round(
-		abs(np.random.random((Screen.screen_vane_count, Screen.screen_vane_length)) - 0.3)
+		abs(np.random.random((Screen.screen_vane_count, Screen.screen_max_magnitude)) - 0.3)
 	)
 
 def random_spawn(gol_arr):
 	region_size = (10, 10)
 	start = (
 		np.random.randint(0, Screen.screen_vane_count-region_size[0]),
-		np.random.randint(0, Screen.screen_vane_length-region_size[1])
+		np.random.randint(0, Screen.screen_max_magnitude-region_size[1])
 	)
 	gol_arr[start[0]:start[0]+10, start[1]:start[1]+10] = np.round(
 		abs(np.random.random((10, 10)) - 0.3)
@@ -96,13 +96,13 @@ def random_spawn(gol_arr):
 
 def game_of_life(writer, sub_prog='random'):
 	with writer as writer_buf:
-		writer_buf_reshaped = writer_buf.reshape((Screen.screen_vane_count, Screen.screen_vane_length, 3))
+		writer_buf_reshaped = writer_buf.reshape((Screen.screen_vane_count, Screen.screen_max_magnitude, 3))
 
 
-		gol_arr_r = np.zeros((Screen.screen_vane_count, Screen.screen_vane_length), dtype=bool)
-		gol_arr_g = np.zeros((Screen.screen_vane_count, Screen.screen_vane_length), dtype=bool)
-		gol_arr_b = np.zeros((Screen.screen_vane_count, Screen.screen_vane_length), dtype=bool)
-		gol_arr_d = np.zeros((Screen.screen_vane_count, Screen.screen_vane_length), dtype=bool)
+		gol_arr_r = np.zeros((Screen.screen_vane_count, Screen.screen_max_magnitude), dtype=bool)
+		gol_arr_g = np.zeros((Screen.screen_vane_count, Screen.screen_max_magnitude), dtype=bool)
+		gol_arr_b = np.zeros((Screen.screen_vane_count, Screen.screen_max_magnitude), dtype=bool)
+		gol_arr_d = np.zeros((Screen.screen_vane_count, Screen.screen_max_magnitude), dtype=bool)
 
 
 		if sub_prog == 'random':

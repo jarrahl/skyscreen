@@ -31,49 +31,53 @@ def run_displayimage(shared_path, python_proc):
 	os.waitpid(python_proc, 0)
 
 def main():
+	parser = argparse.ArgumentParser(usage='name options: noise, bands')
+	parser.add_argument('name', help='The name of the program to run')
+	args = parser.parse_args()
+	name = args.name
+	
+	run_named(name)
+
+def run_named(name):
 	#shared_file = tempfile.NamedTemporaryFile()
 	SF = namedtuple('SF', ['name'])
 	shared_file = SF(name='rendering/foo')
 
-	parser = argparse.ArgumentParser(usage='name options: noise, bands')
-	parser.add_argument('name', help='The name of the program to run')
-	args = parser.parse_args()
-
 	pid = os.fork()
 	if pid != 0:
 		run_displayimage(shared_file.name, pid)
-		exit(0)
+		return
 	#lock = skyscreen_core.interface.FlockWriterSync(shared_file.name)
 	#lock = skyscreen_core.interface.DummyWriterSync()
 	lock = skyscreen_core.interface.ZMQWriterSync()
 	writer = skyscreen_core.memmap_interface.NPMMAPScreenWriter(shared_file.name, lock)
 
-	if args.name == 'noise':
+	if name == 'noise':
 		noise.noise(writer)
-	elif args.name == 'bands':
+	elif name == 'bands':
 		bands.bands(writer)
-	elif args.name == 'npnoise':
+	elif name == 'npnoise':
 		noise.numpy_random(writer)
-	elif args.name == 'theano.swirl':
+	elif name == 'theano.swirl':
 		theano_examples.theano_swirl(writer)
-	elif args.name == 'theano.tripdar':
+	elif name == 'theano.tripdar':
 		theano_examples.theano_tripdar(writer)
-	elif args.name == 'theano.radar':
+	elif name == 'theano.radar':
 		theano_examples.theano_radar(writer)
-	elif args.name == 'theano.droplet':
+	elif name == 'theano.droplet':
 		theano_examples.theano_droplet(writer)
-	elif args.name == 'chaos':
+	elif name == 'chaos':
 		chaos.chaos(writer)
-	elif args.name == 'fsm.rps':
+	elif name == 'fsm.rps':
 		fsm.rps(writer)
-	elif args.name == 'fsm.random_game':
+	elif name == 'fsm.random_game':
 		fsm.game_of_life(writer, sub_prog='random')
-	elif args.name == 'fsm.gliders':
+	elif name == 'fsm.gliders':
 		fsm.game_of_life(writer, sub_prog='gliders')
-	elif args.name == 'test.lines':
+	elif name == 'test.lines':
 		screens.test_patterns.simple_lines(writer)
-	elif args.name == 'test.grid':
+	elif name == 'test.grid':
 		screens.test_patterns.grid(writer)
 	else:
-		logging.error('Unknown name "%s"', args.name)
+		logging.error('Unknown name "%s"', name)
 		sys.exit(1)

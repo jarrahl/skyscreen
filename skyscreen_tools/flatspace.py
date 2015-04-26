@@ -21,7 +21,7 @@ class FlatSpaceTransform(skyscreen_core.interface.ScreenWriter):
 	def __enter__(self):
 		assert self.screen_buffer is None, 'Cannot enter twice'
 		self.writer_buf = self.writer.__enter__()
-		self.writer_buf_resized = self.writer_buf.reshape((Screen.screen_vane_count, Screen.screen_vane_length, 3))
+		self.writer_buf_resized = self.writer_buf.reshape((Screen.screen_vane_count, Screen.screen_max_magnitude, 3))
 		self.screen_buffer = np.zeros((n_screen_rows, n_screen_cols, 3), dtype=np.uint8)
 		return self.screen_buffer
 

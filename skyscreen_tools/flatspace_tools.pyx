@@ -7,7 +7,7 @@ cdef extern from "math.h":
 	double round(double x)
 	double cos(double x)
 cdef int total_angles = Screen.screen_vane_count
-cdef int total_mag = Screen.screen_vane_length
+cdef int total_mag = Screen.screen_max_magnitude
 
 @cython.boundscheck(True)
 def polar_remap(np.ndarray[np.uint8_t, ndim = 3] input, np.ndarray[np.uint8_t, ndim = 3] output):

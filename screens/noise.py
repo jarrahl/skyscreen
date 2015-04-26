@@ -19,7 +19,7 @@ def noise(writer):
 			writer.frame_ready()
 			print '.',; sys.stdout.flush()
 			for vane in xrange(Screen.screen_vane_count):
-				for pixel in xrange(Screen.screen_vane_length):
+				for pixel in xrange(Screen.screen_max_magnitude):
 					for channel in {'r', 'g', 'b'}:
 						c = random.randint(0, 255)
 						offset = pixel_vane_mapping(vane, pixel, channel)

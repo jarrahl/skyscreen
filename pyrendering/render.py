@@ -31,13 +31,13 @@ class MainRender(cli.Application):
 
 	def make_mapping_matrix(self):
 		paintable_area = 0.95 * (self.window_size / 2.0 - self.annulus)
-		angles = np.zeros((interface.Screen.screen_vane_count, interface.Screen.screen_vane_length))
-		magnitudes = np.zeros((interface.Screen.screen_vane_count, interface.Screen.screen_vane_length))
+		angles = np.zeros((interface.Screen.screen_vane_count, interface.Screen.screen_max_magnitude))
+		magnitudes = np.zeros((interface.Screen.screen_vane_count, interface.Screen.screen_max_magnitude))
 		for angle in xrange(interface.Screen.screen_vane_count):
-			for mag in xrange(interface.Screen.screen_vane_length):
+			for mag in xrange(interface.Screen.screen_max_magnitude):
 				render_angle = angle / float(interface.Screen.screen_vane_count) * 2.0 * 3.14159
-				render_mag = self.annulus + (interface.Screen.screen_vane_length - mag) / \
-											float(interface.Screen.screen_vane_length) * paintable_area
+				render_mag = self.annulus + (interface.Screen.screen_max_magnitude - mag) / \
+											float(interface.Screen.screen_max_magnitude) * paintable_area
 				angles[angle, mag] = render_angle
 				magnitudes[angle, mag] = render_mag
 		cols, rows = cv2.polarToCart(magnitudes, angles)

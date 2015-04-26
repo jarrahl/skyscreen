@@ -3,7 +3,7 @@ cimport numpy as np
 cimport cython
 
 cdef int screen_max_angle = skyscreen_core.interface.Screen.screen_vane_count
-cdef int screen_max_magnitude = skyscreen_core.interface.Screen.screen_vane_length
+cdef int screen_max_magnitude = skyscreen_core.interface.Screen.screen_max_magnitude
 
 @cython.boundscheck(True)
 def quickblit(np.ndarray[np.uint8_t, ndim = 3] input_arr,

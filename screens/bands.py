@@ -12,12 +12,12 @@ import skyscreen_core.memmap_interface
 import skyscreen_core.mmap_interface
 
 def bands(writer):
-	band_matrix = np.zeros(shape=(Screen.screen_vane_count, Screen.screen_vane_length, 3))
+	band_matrix = np.zeros(shape=(Screen.screen_vane_count, Screen.screen_max_magnitude, 3))
 
 	count = 0
 
 	with writer as writer_buf:
-		writer_buf_reshaped = writer_buf.reshape((Screen.screen_vane_count, Screen.screen_vane_length, 3))
+		writer_buf_reshaped = writer_buf.reshape((Screen.screen_vane_count, Screen.screen_max_magnitude, 3))
 		while True:
 			writer.frame_ready()
 			for angle in xrange(Screen.screen_vane_count):

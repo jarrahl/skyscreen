@@ -33,7 +33,7 @@ class NPMMAPScreenWriter(BaseMMapInterface, skyscreen_core.interface.ScreenWrite
 		self.shared_memory = np.memmap(self.shared_file,
 						  dtype=np.uint8,
 						  mode='w+',
-						  shape=(self.screen_vane_count*self.screen_vane_length*3))
+						  shape=(self.screen_vane_count*self.screen_max_magnitude*3))
 		return self.shared_memory
 
 	def __exit__(self, exc_type, exc_val, exc_tb):
@@ -52,7 +52,7 @@ class NPMMAPScreenReader(BaseMMapInterface, skyscreen_core.interface.ScreenWrite
 		array = np.memmap(self.shared_file,
 						  dtype=np.uint8,
 						  mode='r',
-						  shape=(self.screen_vane_count*self.screen_vane_length*3))
+						  shape=(self.screen_vane_count*self.screen_max_magnitude*3))
 		return array
 
 	def __enter__(self):
