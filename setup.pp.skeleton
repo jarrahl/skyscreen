@@ -119,3 +119,10 @@ python::pip{"plumbum":
 	owner => $user,
 	require => Exec["virtualenv --system-site-packages ${venv}"],
 }
+python::pip{"pyyaml":
+	pkgname => "pyyaml",
+	ensure => "present",
+	virtualenv => $venv,
+	owner => $user,
+	require => Exec["virtualenv --system-site-packages ${venv}"],
+}

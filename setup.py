@@ -19,7 +19,8 @@ setup(name='Skyscreen',
             'nose',
             'pyzmq',
             'plumbum',
-            'scales'
+            'scales',
+            'pyyaml'
       ],
       ext_modules=cythonize("skyscreen_tools/flatspace_tools.pyx")
 )
