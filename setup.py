@@ -1,6 +1,7 @@
 #from distutils.core import setup
 from setuptools import setup
 from Cython.Build import cythonize
+import numpy
 
 setup(name='Skyscreen',
       version='0.1',
@@ -11,7 +12,7 @@ setup(name='Skyscreen',
       packages=[
             'skyscreen_tools',
             'skyscreen_core',
-            'screens'],
+            'patterns'],
       requires=[
             'numpy',
             'theano',
@@ -22,5 +23,6 @@ setup(name='Skyscreen',
             'scales',
             'pyyaml'
       ],
-      ext_modules=cythonize("skyscreen_tools/flatspace_tools.pyx")
+      include_dirs = [numpy.get_include()],
+      ext_modules=cythonize(["pyrendering/fast_tools.pyx", "skyscreen_tools/flatspace_tools.pyx"])
 )

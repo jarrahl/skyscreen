@@ -39,16 +39,34 @@ In the future I'd like to implement:
 ```
 Although this hasn't yielded any large speedups that I can see, but I'm not sure if that's just because the computation isn't very complex.
 
+# Mac Installation (Also non puppet install) #
 
+Linux users replace brew commands with apt-get and xcode with build-essentials
+
+First make sure you have brew and xcode installed
+
+brew: `ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
+
+xcode: `https://developer.apple.com/xcode/downloads/`
+
+Then run the following
+```git clone https://bitbucket.org/ririau/skyscreen.git
+brew tap homebrew/science
+brew install python opencv cmake zmq 
+
+pip install nose theano numpy scales plumbum cython
+
+python setup.py develop
+```
 
 ## Building the rendering ##
 
 You shouldn't need to do this - it's done as part of setup.pp, but if you 
 need to, here's how:
 
-- cd rednering
-- cmake .
-- make 
+    cd rendering
+    cmake .
+    make 
 
 Once you've got cmake to run once, you can just keep using make to build it.
 
@@ -63,7 +81,7 @@ And they should all pass, although they'll spam the screen with some pygame wind
 
 There are a few ways to run it. The easiest is simply:
 
-    python -m screens noise
+    python -m patterns noise
     
 This will fork a DisplayImage process, and when you exit the image, it'll exit the python code as well.
 

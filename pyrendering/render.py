@@ -5,9 +5,7 @@ from greplin import scales
 import skyscreen_core.interface as interface
 import skyscreen_core.memmap_interface
 import skyscreen_tools.reshape_wrapper
-import pyximport;
 
-pyximport.install()
 import pyrendering.fast_tools
 
 
