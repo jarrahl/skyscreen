@@ -20,6 +20,7 @@ names = [
 
 class Runner(cli.Application):
 	list = False
+	display_old = False
 	DESCRIPTION = """
 	Run the cool applications. You can specify
 	an application, or you can just pass no
@@ -31,6 +32,10 @@ class Runner(cli.Application):
 	def set_list(self):
 		self.list = True
 
+	@cli.switch('--old-display', help='Use the old (broken) display')
+	def set_display_old(self):
+		self.display_old = True
+
 	def main(self, name=None):
 		if self.list:
 			print "Here is the list of things you can render"
@@ -38,10 +43,10 @@ class Runner(cli.Application):
 				print "\t%s" % name
 			return 0
 		if name:
-			patterns.run_named(name)
+			patterns.run_named(name, use_old_display=self.display_old)
 		else:
 			for name in names:
-				patterns.run_named(name)
+				patterns.run_named(name, use_old_display=self.display_old)
 		return 0
 
 
