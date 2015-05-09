@@ -1,41 +1,40 @@
-import math
+from skyscreen_core import interface
 from skyscreen_core.interface import Screen
 cimport numpy as np
 cimport cython
 cdef extern from "math.h":
 	double sin(double x)
 	double round(double x)
+	double tan(double x)
 	double cos(double x)
+	double sqrt(double x)
+	double atan2(double x, double y)
+	double pi
 cdef int total_angles = Screen.screen_vane_count
 cdef int total_mag = Screen.screen_max_magnitude
 
+cdef int window_size, annulus, paintable_area;
+window_size = 800
+annulus = 50
+paintable_area = interface.Screen.screen_max_magnitude*2+annulus*2
+
 @cython.boundscheck(True)
-def polar_remap(np.ndarray[np.uint8_t, ndim = 3] input, np.ndarray[np.uint8_t, ndim = 3] output):
-	cdef int angle, mag
-	cdef int col, row
+def blit(np.ndarray[np.uint8_t, ndim = 3] input,
+		 np.ndarray[np.uint8_t, ndim = 3] output,
+		 np.ndarray[np.int32_t, ndim = 2] mags,
+		 np.ndarray[np.int32_t, ndim = 2] angles):
 	cdef int r, g, b
-	for angle in xrange(total_angles):
-		for mag in xrange(total_mag):
-			row, col = c_polar_coord_transform(mag, angle)
-			r = input[row, col, 0]
-			output[angle, mag, 0] = r
-			g = input[row, col, 1]
-			output[angle, mag, 1] = g
-			b = input[row, col, 2]
-			output[angle, mag, 2] = b
-
-# A wrapper for the c_polar_coord_transform below.
-def polar_coord_transform(mag, angle):
-	cdef int i_mag, i_angle
-	i_angle = angle
-	i_mag = mag
-	return c_polar_coord_transform(i_mag, i_angle)
-
-cdef (int, int)c_polar_coord_transform(int mag, int angle):
-	cdef double d_angle, d_mag
-	d_angle = <double>angle
-	d_mag   = <double>mag
-	row = <int>round(d_mag * sin(d_angle/360.0 * 2.0 * 3.14159265)) # Like Y
-	col = <int>round(d_mag * cos(d_angle/360.0 * 2.0 * 3.14159265)) # Like X
-	return row, col
+	cdef int row, col
+	cdef int mag, angle
+	for row in xrange(paintable_area):
+		for col in xrange(paintable_area):
+			mag = mags[row, col]
+			angle = angles[row, col]
+			if 0 <= mag < total_mag and 0 <= angle < total_angles:
+				r = input[row, col, 0]
+				g = input[row, col, 1]
+				b = input[row, col, 2]
+				output[angle, mag, 0] = r
+				output[angle, mag, 1] = g
+				output[angle, mag, 2] = b
 

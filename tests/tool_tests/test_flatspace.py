@@ -1,11 +1,11 @@
+import math
 import numpy as np
 
-import pyximport;
 import time
 
 from skyscreen_core.interface import Screen
 
-pyximport.install()
+import pyximport; pyximport.install()
 import skyscreen_tools.flatspace
 import skyscreen_tools.flatspace_tools
 
@@ -31,19 +31,22 @@ def test_remap_time():
 
 def test_coord_mapping():
 	def test_fn(polar, cart):
-		result = skyscreen_tools.flatspace_tools.polar_coord_transform(polar[0], polar[1])
+		result = skyscreen_tools.flatspace.simple_polar(polar[0], float(polar[1])/360.0 * 2.0 * 3.141592)
+		uncart = skyscreen_tools.flatspace.simple_cart(result[0], result[1])
 		assert result == cart, \
 			"polar coord %s was transformed to %s rather than %s" % (polar, result, cart)
+		assert np.round(uncart[0]) == polar[0]
+		assert np.round(uncart[1] / (2*3.14159265) * 360.0) == polar[1]
 
-	yield test_fn, (10, 0), (0, 10)
-	yield test_fn, (10, 90), (10, 0)
-	yield test_fn, (10, 180), (0, -10)
-	yield test_fn, (10, 270), (-10, 0)
+	yield test_fn, (10, 0),    (0, 10)
+	yield test_fn, (10, 90),   (10, 0)
+	yield test_fn, (10, 180),  (0, -10)
+	yield test_fn, (10, -90),  (-10, 0)
 
-	yield test_fn, (100, 0), (0, 100)
-	yield test_fn, (100, 90), (100, 0)
+	yield test_fn, (100, 0),   (0, 100)
+	yield test_fn, (100, 90),  (100, 0)
 	yield test_fn, (100, 180), (0, -100)
-	yield test_fn, (100, 270), (-100, 0)
+	yield test_fn, (100, -90), (-100, 0)
 
 	yield test_fn, (100, 45 + 0), \
 		(np.round(1 / np.sqrt(2.0) * 100), np.round(1 / np.sqrt(2.0) * 100))
@@ -52,3 +55,4 @@ def test_coord_mapping():
 	# yield test_fn, (100, 45 + 90),  (100, 0)
 	# yield test_fn, (100, 45 + 180), (0, -100)
 	# yield test_fn, (100, 45 + 270), (-100, 0)
+

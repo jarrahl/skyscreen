@@ -20,6 +20,7 @@ class ReshapingWriterWrapper(core.ScreenWriter):
 class ReshapingWriterReader(core.ScreenReader):
 	def __init__(self, reader):
 		self.reader = reader
+		self.buf = None
 
 	def __enter__(self):
 		self.buf = self.reader.__enter__()
@@ -27,7 +28,8 @@ class ReshapingWriterReader(core.ScreenReader):
 
 	def __exit__(self, type, value, traceback):
 		del self.buf
-		self.reader.__exit__(type, value, traceback)
+		if hasattr(self.reader, '__exit__'):
+			self.reader.__exit__(type, value, traceback)
 
 	def start_read(self):
 		self.reader.start_read()

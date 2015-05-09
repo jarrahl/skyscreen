@@ -1,12 +1,11 @@
 import cv2
 import numpy as np
 from plumbum import cli
-from greplin import scales
 import skyscreen_core.interface as interface
 import skyscreen_core.memmap_interface
 import skyscreen_tools.reshape_wrapper
-
-import pyrendering.fast_tools
+import pyximport; pyximport.install()
+import fast_tools
 
 
 def create_windows():
@@ -33,7 +32,7 @@ class MainRender(cli.Application):
 		magnitudes = np.zeros((interface.Screen.screen_vane_count, interface.Screen.screen_max_magnitude))
 		for angle in xrange(interface.Screen.screen_vane_count):
 			for mag in xrange(interface.Screen.screen_max_magnitude):
-				render_angle = angle / float(interface.Screen.screen_vane_count) * 2.0 * 3.14159
+				render_angle = (angle+0.5) / float(interface.Screen.screen_vane_count) * 2.0 * 3.14159
 				render_mag = self.annulus + (interface.Screen.screen_max_magnitude - mag) / \
 											float(interface.Screen.screen_max_magnitude) * paintable_area
 				angles[angle, mag] = render_angle
@@ -68,7 +67,7 @@ class MainRender(cli.Application):
 				bgr_fixed[:, :, 2] = reader_buf[:, :, 0]
 				reader.finish_read()
 				cv2.resize(bgr_fixed, (self.window_size, self.window_size), raw_image)
-				pyrendering.fast_tools.quickblit(
+				fast_tools.quickblit(
 					bgr_fixed,
 					polar_image,
 					rows,

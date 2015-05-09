@@ -4,9 +4,9 @@ import fcntl
 
 class Screen(object):
 	screen_max_magnitude = 288
-	screen_rows = screen_max_magnitude
+	screen_cols = screen_max_magnitude
 	screen_vane_count = 360
-	screen_cols = screen_vane_count
+	screen_rows = screen_vane_count
 	array_size = screen_vane_count * screen_max_magnitude * 3
 
 chanmap = {
