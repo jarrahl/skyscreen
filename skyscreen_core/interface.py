@@ -1,13 +1,42 @@
+# coding=utf-8
 import logging
 import os
 import fcntl
 
+
 class Screen(object):
+	"""
+	General bits and pieces that define how the screen fits together.
+
+	- screen_max_magnitude - the length of a screen arm, in terms of LEDs
+	- screen_cols - the same as screen_max_magnitude
+	- screen_vane_count - the angular resolution, ie, there are this many separate arm positions.
+	- screen_rows - the same as screen_vane_count
+	- array size - because we represent the screen as an array, this is its total size.
+
+	Array Format
+	============
+
+	The skyscreen array looks like this in memory ::
+
+		        0                   screen_max_magnitude
+		        ┌─────────────────────────────────────┐   0
+		inside  │rgbrgbrgbrgbrgbrgbgrbgrbgrgbrgbrgbrgb│ outside
+		of      │rgbrgbrgbrgbrgbrgbgrbgrbgrgbrgbrgbrgb│  of
+		screen                 ...                      screen
+		                       ...
+		        │rgbrgbrgbrgbrgbrgbgrbgrbgrgbrgbrgbrgb│
+		        └─────────────────────────────────────┘ screen_vane_count
+
+	:func:`pixel_vane_mapping` defines the exact pixel to offset mapping
+
+	"""
 	screen_max_magnitude = 288
 	screen_cols = screen_max_magnitude
 	screen_vane_count = 360
 	screen_rows = screen_vane_count
 	array_size = screen_vane_count * screen_max_magnitude * 3
+
 
 chanmap = {
 	'r': 0,
@@ -15,8 +44,15 @@ chanmap = {
 	'b': 2
 }
 
+
 def pixel_vane_mapping(vane, pixel, channel):
+	"""
+	Gives the offset of a pixel::
+
+		(vane * Screen.screen_max_magnitude * 3) + pixel * 3 + chanmap[channel]
+	"""
 	return (vane * Screen.screen_max_magnitude * 3) + pixel * 3 + chanmap[channel]
+
 
 class ScreenBuffer(object):
 	"""An abstract screen buffer"""
@@ -68,8 +104,10 @@ class WriterSync(object):
 class ReaderSync(object):
 	def start_read(self):
 		raise NotImplementedError()
+
 	def finish_read(self):
 		raise NotImplementedError()
+
 
 class SemaphoreWriterSync(WriterSync):
 	def __init__(self, sem):
@@ -82,11 +120,13 @@ class SemaphoreWriterSync(WriterSync):
 		self.sem.release()
 		self.sem.acquire()
 
+
 class SemaphoreReaderSync(ReaderSync):
 	def __init__(self, sem):
 		self.sem = sem
 		assert not sem.acquire(blocking=False), \
 			'The semaphore should be acquired by the reader'
+
 	def start_read(self):
 		self.sem.acquire()
 
@@ -97,13 +137,18 @@ class SemaphoreReaderSync(ReaderSync):
 class DummyWriterSync(WriterSync):
 	def __init__(self):
 		logging.warning('A dummy WriterSync is being used. Sync calls do nothing')
+
 	def frame_ready(self):
 		pass
+
+
 class DummyReaderSync(WriterSync):
 	def __init__(self):
 		logging.warning('A dummy WriterSync is being used. Sync calls do nothing')
+
 	def start_read(self):
 		pass
+
 	def finish_read(self):
 		pass
 
@@ -114,7 +159,7 @@ class FlockWriterSync(WriterSync):
 		self.lock_handle = os.open(self.lock_file, os.O_RDONLY)
 		logging.info("Locking file %s", self.lock_file)
 		fcntl.flock(self.lock_handle, fcntl.LOCK_EX)
-	
+
 	def frame_ready(self):
 		logging.info('Frame ready, unclocking %s', self.lock_file)
 		fcntl.flock(self.lock_handle, fcntl.LOCK_UN)
@@ -122,7 +167,9 @@ class FlockWriterSync(WriterSync):
 		fcntl.flock(self.lock_handle, fcntl.LOCK_EX)
 		logging.info('Locked %s', self.lock_file)
 
+
 import zmq
+
 
 class ZMQWriterSync(WriterSync):
 	def __init__(self, port=5555):
@@ -136,6 +183,7 @@ class ZMQWriterSync(WriterSync):
 		logging.info('Awaiting done message')
 		self.socket.recv()
 		logging.info('Finished')
+
 
 class ZMQReaderSync(ReaderSync):
 	def __init__(self, port=5555):

@@ -9,15 +9,18 @@ import skyscreen_tools.flatspace
 from skyscreen_tools.reshape_wrapper import ReshapingWriterWrapper
 from patterns.cli import PatternPlayer, PatternPlayerMixin
 
+
 @PatternPlayer.subcommand("grid")
 class GridCLI(cli.Application, PatternPlayerMixin):
 	def main(self):
 		self.main_from_renderer(grid)
 
+
 @PatternPlayer.subcommand("simplelines")
 class SimpleLinesCLI(cli.Application, PatternPlayerMixin):
 	def main(self):
 		self.main_from_renderer(simple_lines)
+
 
 def _grid(writer):
 	reshaped = ReshapingWriterWrapper(writer)
@@ -29,9 +32,10 @@ def _grid(writer):
 		while True:
 			reshaped.frame_ready()
 
+
 def grid(writer):
 	reshaped = skyscreen_tools.flatspace.FlatSpaceTransform(writer)
-	#reshaped = skyscreen_tools.reshape_wrapper.ReshapingWriterWrapper(writer)
+	# reshaped = skyscreen_tools.reshape_wrapper.ReshapingWriterWrapper(writer)
 	with reshaped as writer_buf:
 		writer_buf[:, :, :] = 0
 		for i in range(0, Screen.screen_vane_count, 20):
@@ -41,8 +45,9 @@ def grid(writer):
 		while True:
 			reshaped.frame_ready()
 
+
 def simple_lines(writer):
-	#with writer as writer_buf:
+	# with writer as writer_buf:
 	#	writer_buf_reshape = writer_buf.reshape((Screen.screen_vane_count, Screen.screen_vane_length, 3))
 	#	while True:
 	#		writer_buf_reshape[0, :, 0] = 255/4
@@ -53,14 +58,14 @@ def simple_lines(writer):
 	#		lock.frame_ready()
 
 	flatspace = skyscreen_tools.flatspace.FlatSpaceTransform(writer)
-	#flatspace = skyscreen_tools.reshape_wrapper.ReshapingWriterWrapper(writer)
+	# flatspace = skyscreen_tools.reshape_wrapper.ReshapingWriterWrapper(writer)
 	with flatspace as flatspace_buf:
 		step = 100
 		space = np.resize(np.linspace(0, 254, Screen.screen_vane_count),
 						  (Screen.screen_vane_count, Screen.screen_vane_count))
 		flatspace_buf[:, :, 2] = 255
-		#flatspace_buf[:, :, 1] = space.T
-		#flatspace_buf[:, :, 0] = 255*np.eye(Screen.screen_vane_count)
+		# flatspace_buf[:, :, 1] = space.T
+		# flatspace_buf[:, :, 0] = 255*np.eye(Screen.screen_vane_count)
 		while False:
 			flatspace.frame_ready()
 		while True:

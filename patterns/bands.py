@@ -15,11 +15,21 @@ from patterns.cli import PatternPlayer, PatternPlayerMixin
 
 @PatternPlayer.subcommand("bands")
 class BandsCLI(cli.Application, PatternPlayerMixin):
+	"""
+	Run the test bands program
+	"""
 	def main(self):
 		self.main_from_renderer(bands)
 
 
 def bands(writer):
+	"""
+	Write test bands to the skysceen. These are radial bands of different
+	colors, which advance each frame.
+
+	:param writer: A writer to use
+	:type writer: :class:`skyscreen_core.memmap_interface.NPMMAPScreenWriter`
+	"""
 	band_matrix = np.zeros(shape=(Screen.screen_vane_count, Screen.screen_max_magnitude, 3))
 
 	count = 0

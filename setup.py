@@ -12,9 +12,13 @@ setup(name='Skyscreen',
       packages=[
             'skyscreen_tools',
             'skyscreen_core',
-            'patterns'],
-      requires=[
+            'pyrendering',
+            'patterns'
+      ],
+      install_requires=[
             'numpy',
+            'sphinx',
+            'sphinx-autobuild',
             'theano',
             'cython',
             'nose',
@@ -23,6 +27,6 @@ setup(name='Skyscreen',
             'scales',
             'pyyaml'
       ],
-      include_dirs = [numpy.get_include()],
-      ext_modules=cythonize(["pyrendering/fast_tools.pyx", "skyscreen_tools/flatspace_tools.pyx"])
+      include_dirs = [numpy.get_include()]
+      # ext_modules=cythonize(["pyrendering/fast_tools.pyx", "skyscreen_tools/flatspace_tools.pyx"])
 )

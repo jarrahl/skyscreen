@@ -10,16 +10,29 @@ from skyscreen_core.interface import Screen, pixel_vane_mapping
 
 @PatternPlayer.subcommand("noise")
 class NoisePattern(cli.Application, PatternPlayerMixin):
+	"""
+	Fill the skyscreen with noise, using a SLOW noise function
+	"""
 	def main(self):
 		self.main_from_renderer(noise)
 
 
 @PatternPlayer.subcommand("npnoise")
 class NPNoisePattern(cli.Application, PatternPlayerMixin):
+	"""
+	Fill the skyscreen with noise with a FAST noise function
+	"""
 	def main(self):
 		self.main_from_renderer(numpy_random)
 
 def numpy_random(writer):
+	"""
+	Generate random noise for the skyscreen, and do so with the
+	numpy random generator, which is nice and fast
+
+	:param writer: A writer to use
+	:type writer: :class:`skyscreen_core.memmap_interface.NPMMAPScreenWriter`
+	"""
 	with writer as writer_buf:
 		while True:
 			writer.frame_ready()
@@ -27,6 +40,14 @@ def numpy_random(writer):
 			writer_buf.flush()
 
 def noise(writer):
+	"""
+	Generate random noise for the skyscreen, and do so with the
+	python random generator on every pixel seperately, which is very slow.
+
+	:param writer: A writer to use
+	:type writer: :class:`skyscreen_core.memmap_interface.NPMMAPScreenWriter`
+	"""
+
 	with writer as writer_buf:
 		while True:
 			writer.frame_ready()

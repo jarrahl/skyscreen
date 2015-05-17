@@ -1,11 +1,29 @@
 import numpy as np
-import scipy.ndimage.filters as filters
-import time
+import plumbum.cli as cli
+
+from patterns.cli import PatternPlayer, PatternPlayerMixin
 from skyscreen_core.interface import Screen
 
 
-
 def game_of_life_channel(gol_arr):
+	"""
+	Run the game of life on an array. Do so INPLACE
+
+	This works by building 8 different arrays, each of which is
+	a copy of the game of life array which has been rolled. The
+	roll operation takes a numpy array and "rolls" it so one of
+	the columns or rows is on the other side of the array.
+
+	Then, we take the rolled arrays and the originala array,
+	and sums them all, and apply
+	a simple set of rules:
+
+	- if the sum is 3, then set the gol_array entry to true
+	- otherwise then set it false
+
+	:param gol_arr: the array of game of life pixels
+	:type gol_arr: a 2d numpy array of booleans
+	"""
 	right = np.roll(gol_arr, 1)
 	left = np.roll(gol_arr, -1)
 	down = np.roll(gol_arr, 1, axis=0)
@@ -25,59 +43,91 @@ def game_of_life_channel(gol_arr):
 	px_sums += downright
 	px_sums += downleft
 	px_sums += gol_arr
-	#import debug
 
 	gol_arr[px_sums == 3] = True
-	gol_arr[px_sums < 3] = False
-	gol_arr[px_sums > 4] = False
+	gol_arr[px_sums != 3] = False
+
 
 def init_gliders(gol_arr):
+	"""
+	Initialize a game of life array with some gliders.
+	Do so inplace.
+
+	:param gol_arr: the array of game of life pixels
+	:type gol_arr: a 2d numpy array of booleans
+	"""
 	for i in range(0, 100, 5):
-		gol_arr[i+0, i+1] = True
-		gol_arr[i+1, i+2] = True
-		gol_arr[i+2, i+0] = True
-		gol_arr[i+2, i+1] = True
-		gol_arr[i+2, i+2] = True
+		gol_arr[i + 0, i + 1] = True
+		gol_arr[i + 1, i + 2] = True
+		gol_arr[i + 2, i + 0] = True
+		gol_arr[i + 2, i + 1] = True
+		gol_arr[i + 2, i + 2] = True
 
-		gol_arr[i+1+10, i+0] = True
-		gol_arr[i+2+10, i+1] = True
-		gol_arr[i+0+10, i+2] = True
-		gol_arr[i+1+10, i+2] = True
-		gol_arr[i+2+10, i+2] = True
+		gol_arr[i + 1 + 10, i + 0] = True
+		gol_arr[i + 2 + 10, i + 1] = True
+		gol_arr[i + 0 + 10, i + 2] = True
+		gol_arr[i + 1 + 10, i + 2] = True
+		gol_arr[i + 2 + 10, i + 2] = True
 
+		gol_arr[i - 1 + 144, i + 0] = True
+		gol_arr[i - 2 + 144, i + 1] = True
+		gol_arr[i - 0 + 144, i + 2] = True
+		gol_arr[i - 1 + 144, i + 2] = True
+		gol_arr[i - 2 + 144, i + 2] = True
 
-		gol_arr[i-1+144, i+0] = True
-		gol_arr[i-2+144, i+1] = True
-		gol_arr[i-0+144, i+2] = True
-		gol_arr[i-1+144, i+2] = True
-		gol_arr[i-2+144, i+2] = True
 
 def init_random(gol_arr):
+	"""
+	Initialize a game of life array with some gliders.
+	Do so inplace.
+
+	:param gol_arr: the array of game of life pixels
+	:type gol_arr: a 2d numpy array of booleans
+	"""
 	gol_arr[:] = np.round(
 		abs(np.random.random((Screen.screen_vane_count, Screen.screen_max_magnitude)) - 0.3)
 	)
 
+
 def random_spawn(gol_arr):
+	"""
+	Set a random 10x10 subregion of the game of life array
+	to a random pattern of pixels.
+
+	:param gol_arr: the array of game of life pixels
+	:type gol_arr: a 2d numpy array of booleans
+	"""
 	region_size = (10, 10)
 	start = (
-		np.random.randint(0, Screen.screen_vane_count-region_size[0]),
-		np.random.randint(0, Screen.screen_max_magnitude-region_size[1])
+		np.random.randint(0, Screen.screen_vane_count - region_size[0]),
+		np.random.randint(0, Screen.screen_max_magnitude - region_size[1])
 	)
-	gol_arr[start[0]:start[0]+10, start[1]:start[1]+10] = np.round(
+	gol_arr[start[0]:start[0] + 10, start[1]:start[1] + 10] = np.round(
 		abs(np.random.random((10, 10)) - 0.3)
 	)
 
 
 def game_of_life(writer, sub_prog='random'):
+	"""
+	Play game of life in a writer array.
+
+	The subprogram sets the exact behaviour:
+
+	- "random" will initalize it randomly with :func:`random_spawn` which
+	is called periodically
+	- gliders will initalize some gliders with :func:`init_gliders`
+
+	:param writer: A writer to use
+	:type writer: :class:`skyscreen_core.memmap_interface.NPMMAPScreenWriter`
+	:param sub_prog: the subprogram.
+	"""
 	with writer as writer_buf:
 		writer_buf_reshaped = writer_buf.reshape((Screen.screen_vane_count, Screen.screen_max_magnitude, 3))
-
 
 		gol_arr_r = np.zeros((Screen.screen_vane_count, Screen.screen_max_magnitude), dtype=bool)
 		gol_arr_g = np.zeros((Screen.screen_vane_count, Screen.screen_max_magnitude), dtype=bool)
 		gol_arr_b = np.zeros((Screen.screen_vane_count, Screen.screen_max_magnitude), dtype=bool)
 		gol_arr_d = np.zeros((Screen.screen_vane_count, Screen.screen_max_magnitude), dtype=bool)
-
 
 		if sub_prog == 'random':
 			# init_random(gol_arr_r)
@@ -101,9 +151,9 @@ def game_of_life(writer, sub_prog='random'):
 				random_spawn(gol_arr_g)
 				random_spawn(gol_arr_b)
 				random_spawn(gol_arr_d)
-			#writer_buf_reshaped[:, :, 0] = gol_arr_r * 255
-			#writer_buf_reshaped[:, :, 1] = gol_arr_g * 255
-			#writer_buf_reshaped[:, :, 2] = gol_arr_b * 255
+			# writer_buf_reshaped[:, :, 0] = gol_arr_r * 255
+			# writer_buf_reshaped[:, :, 1] = gol_arr_g * 255
+			# writer_buf_reshaped[:, :, 2] = gol_arr_b * 255
 			writer_buf_reshaped[:, :, 0] += brightness * gol_arr_r % 255
 			writer_buf_reshaped[:, :, 1] += brightness * gol_arr_g % 255
 			writer_buf_reshaped[:, :, 2] += brightness * gol_arr_b % 255
@@ -113,12 +163,15 @@ def game_of_life(writer, sub_prog='random'):
 			writer.frame_ready()
 
 
-import plumbum.cli as cli
-from patterns.cli import PatternPlayer, PatternPlayerMixin
+
 
 @PatternPlayer.subcommand('gameoflife')
 class MyPatternCLI(cli.Application, PatternPlayerMixin):
+	"""
+	Play game of life on the skyscreen
+	"""
 	sub_program = cli.SwitchAttr('--subprogram', cli.Set('gliders', 'random'), mandatory=True)
+
 	def main(self):
 		call = lambda writer: game_of_life(writer, self.sub_program)
 		self.main_from_renderer(call)

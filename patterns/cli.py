@@ -12,31 +12,34 @@ How to use it
 =============
 
 Here's what you *probably* want to do. Write your pattern as a function that
-accepts a writer, and has type signature:
+accepts a writer, and has type signature::
 
-```
-def my_pattern(writer):
-    pass #  your code
-```
+	def my_pattern(writer):
+		pass #  your code
 
-Now, just above that, add code like this:
-```
-import plumbum.cli as cli
-from patterns.cli import PatternPlayer, PatternPlayerMixin
 
-@PatternPlayer.subcommand("my_pattern_command")
-class MyPatternCLI(cli.Application, PatternPlayerMixin):
-   def main(self):
-       self.main_from_renderer(my_pattern)
-```
+Now, just above that, add code like this::
+
+	import plumbum.cli as cli
+	from patterns.cli import PatternPlayer, PatternPlayerMixin
+
+	@PatternPlayer.subcommand("my_pattern_command")
+	class MyPatternCLI(cli.Application, PatternPlayerMixin):
+	   def main(self):
+		   self.main_from_renderer(my_pattern)
+
+The last thing to do is to make sure your module is imported in `__init__.py`.
+
+.. warning::
+    Did you read that last line? Here is is again: The last thing to do is to make sure your module is imported in `__init__.py`.
 
 Now, here are the things to note:
- - ```cli.Application``` as a base class. This is a part of an excellent library called plubmbum,
- and it turns this class into a command line tool.
- - ```@PatternPlayer.subcommand("my_pattern")``` this adds this as a "subcommand" of the PatternPlayer,
- which is itself a CLI application. You call your sub-command by calling 'python -m patterns 'my_pattern_command'
- - ```self.main_from_renderer(my_pattern)``` passes your pattern function to the rendering tool, which you can find
- in PatternPlayerMixin.
+ - ``cli.Application`` as a base class. This is a part of an excellent library called plubmbum,
+   and it turns this class into a command line tool.
+ - ``@PatternPlayer.subcommand("my_pattern")`` this adds this as a "subcommand" of the PatternPlayer,
+   which is itself a CLI appl	ication. You call your sub-command by calling ``python -m patterns 'my_pattern_command``
+ - ``self.main_from_renderer(my_pattern)`` passes your pattern function to the rendering tool, which you can find
+   in PatternPlayerMixin.
 
 Goodies and Addons
 ==================
@@ -48,24 +51,26 @@ for details
 Advanced calls
 --------------
 What if your renderer has options, that you pass on the command line? Simple: wrap it in a
-lambda. See this example, which has an extra awesomeness argument, set as an option
-```
-@PatternPlayer.subcommand("my_pattern_command")
-class MyPatternCLI(cli.Application, PatternPlayerMixin):
-    awesomeness = 10.0
-    @cli.switch(['-a', '--awesomeness'], float, help='awesomeness slider')
-    def set_awesomeness(self, awesomeness):
-        self.awesomeness = awesomeness
+lambda. See this example, which has an extra awesomeness argument, set as an option::
 
-    def main(self):
-        callback = lambda writer: my_complex_patter(writer, self.awesomeness)
-        self.main_from_renderer(callback)
+	@PatternPlayer.subcommand("my_pattern_command")
+	class MyPatternCLI(cli.Application, PatternPlayerMixin):
+		awesomeness = 10.0
+		@cli.switch(['-a', '--awesomeness'], float, help='awesomeness slider')
+		def set_awesomeness(self, awesomeness):
+			self.awesomeness = awesomeness
 
-def my_complex_patter(writer, awesomeness):
-    pass  # your code
-```
+		def main(self):
+			callback = lambda writer: my_complex_patter(writer, self.awesomeness)
+			self.main_from_renderer(callback)
+
+	def my_complex_patter(writer, awesomeness):
+		pass  # your code
+
+Troubleshooting
+---------------
+
 """
-import logging
 
 import os
 import subprocess
@@ -79,6 +84,10 @@ import skyscreen_core.interface
 
 
 class PatternPlayerMixin(object):
+	"""
+	This is a mix-in class that you can use to handle almost all the boilerplate
+	of writing a command line client.
+	"""
 	def __init__(self, *args, **kwargs):
 		assert isinstance(self, cli.Application), \
 			'To use this mixin, your object MUST extend cli.Application'
