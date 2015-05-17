@@ -88,6 +88,10 @@ class PatternPlayerMixin(object):
 		"--video",
 		str,
 		help="optional. If provided, record output to this file")
+	flat_target_filename = cli.SwitchAttr(
+		"--flat-video",
+		str,
+		help="optional. If provided, record raw output to this file")
 
 	def run_displayimage(self, shared_path, python_proc):
 		new_env = dict(os.environ.items())
@@ -97,6 +101,9 @@ class PatternPlayerMixin(object):
 		if self.target_filename is not None:
 			call.append('--output-video')
 			call.append(self.target_filename)
+		if self.flat_target_filename is not None:
+			call.append('--output-raw-video')
+			call.append(self.flat_target_filename)
 		display = subprocess.Popen(call, env=new_env)
 		display.wait()
 		os.kill(python_proc, signal.SIGKILL)
