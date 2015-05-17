@@ -6,7 +6,6 @@ import math
 import skyscreen_core
 from skyscreen_core.interface import Screen
 import numpy as np
-import pyximport; pyximport.install()
 import skyscreen_tools.flatspace_tools
 import skyscreen_core.interface as interface
 

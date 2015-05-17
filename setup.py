@@ -1,4 +1,3 @@
-#from distutils.core import setup
 from setuptools import setup
 from Cython.Build import cythonize
 import numpy
@@ -15,9 +14,13 @@ setup(name='Skyscreen',
             'pyrendering',
             'patterns'
       ],
+      setup_requires=[
+            'cython',
+            'numpy'
+      ],
       install_requires=[
             'numpy',
-            'sphinx',
+            'Sphinx',
             'sphinx-autobuild',
             'theano',
             'cython',
@@ -25,8 +28,13 @@ setup(name='Skyscreen',
             'pyzmq',
             'plumbum',
             'scales',
-            'pyyaml'
+            'pyyaml',
       ],
-      include_dirs = [numpy.get_include()]
-      # ext_modules=cythonize(["pyrendering/fast_tools.pyx", "skyscreen_tools/flatspace_tools.pyx"])
+      include_dirs = [
+            numpy.get_include()
+      ],
+      ext_modules=cythonize([
+            "pyrendering/fast_tools.pyx",
+            "skyscreen_tools/flatspace_tools.pyx"
+      ])
 )
