@@ -4,32 +4,6 @@ import time
 from skyscreen_core.interface import Screen
 
 
-def rps(writer):
-	with writer as writer_buf:
-		writer_buf_reshaped = writer_buf.reshape((Screen.screen_vane_count, Screen.screen_max_magnitude, 3))
-		convolution_mat = np.array([
-			[1, 0, 1],
-			[0, 0, 0],
-			[1, 0, 1],
-		]) / 8.0
-
-		r_score = np.zeros((Screen.screen_vane_count, Screen.screen_max_magnitude))
-		g_score = np.zeros((Screen.screen_vane_count, Screen.screen_max_magnitude))
-		b_score = np.zeros((Screen.screen_vane_count, Screen.screen_max_magnitude))
-		r_score[:, 23] = 1.0
-		g_score[33, :] = 1.0
-		b_score[:, 99] = 1.0
-
-		while True:
-			writer.frame_ready()
-
-			r_score += filters.convolve(r_score, convolution_mat)
-			print np.sum(r_score)
-
-			writer_buf_reshaped[:, :, 0] = 255 * r_score
-			writer_buf_reshaped[:, :, 1] = 255 * g_score
-			writer_buf_reshaped[:, :, 2] = 255 * b_score
-
 
 def game_of_life_channel(gol_arr):
 	right = np.roll(gol_arr, 1)
@@ -137,3 +111,14 @@ def game_of_life(writer, sub_prog='random'):
 			writer_buf_reshaped[:, :, 1] *= np.invert(gol_arr_d)
 			writer_buf_reshaped[:, :, 2] *= np.invert(gol_arr_d)
 			writer.frame_ready()
+
+
+import plumbum.cli as cli
+from patterns.cli import PatternPlayer, PatternPlayerMixin
+
+@PatternPlayer.subcommand('gameoflife')
+class MyPatternCLI(cli.Application, PatternPlayerMixin):
+	sub_program = cli.SwitchAttr('--subprogram', cli.Set('gliders', 'random'), mandatory=True)
+	def main(self):
+		call = lambda writer: game_of_life(writer, self.sub_program)
+		self.main_from_renderer(call)

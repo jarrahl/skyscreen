@@ -1,7 +1,7 @@
 """
 Here are some simple example screens. Nothing too fancy.
 """
-from patterns import main
+from patterns.cli import PatternPlayer
 
-if __name__=='__main__':
-	main()
+if __name__ == '__main__':
+	PatternPlayer.run()

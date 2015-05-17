@@ -2,11 +2,22 @@
 This is to test out flatspace tools.
 """
 import numpy as np
+import plumbum.cli as cli
 
 from skyscreen_core.interface import Screen
 import skyscreen_tools.flatspace
 from skyscreen_tools.reshape_wrapper import ReshapingWriterWrapper
+from patterns.cli import PatternPlayer, PatternPlayerMixin
 
+@PatternPlayer.subcommand("grid")
+class GridCLI(cli.Application, PatternPlayerMixin):
+	def main(self):
+		self.main_from_renderer(grid)
+
+@PatternPlayer.subcommand("simplelines")
+class SimpleLinesCLI(cli.Application, PatternPlayerMixin):
+	def main(self):
+		self.main_from_renderer(simple_lines)
 
 def _grid(writer):
 	reshaped = ReshapingWriterWrapper(writer)
@@ -66,7 +77,3 @@ def simple_lines(writer):
 			flatspace_buf[:, c, 1] = 255
 
 			flatspace.frame_ready()
-
-def complicated_droplet(writer):
-	flatspace = skyscreen_tools.flatspace.FlatSpaceTransform(writer)
-	#flatspace = skyscreen_tools.reshape_wrapper.ReshapingWriterWrapper(writer)

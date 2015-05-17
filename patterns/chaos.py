@@ -1,6 +1,13 @@
 import numpy as np
 from skyscreen_core.interface import Screen
 
+import plumbum.cli as cli
+from patterns.cli import PatternPlayer, PatternPlayerMixin
+
+@PatternPlayer.subcommand("chaos")
+class ChaosCLI(cli.Application, PatternPlayerMixin):
+	def main(self):
+		self.main_from_renderer(chaos)
 
 def chaos(writer):
 	with writer as writer_buf:

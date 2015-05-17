@@ -1,5 +1,8 @@
 import logging
 import sys
+from plumbum import cli
+from patterns.cli import PatternPlayerMixin, PatternPlayer
+
 try:
 	import theano
 	import theano.tensor as T
@@ -106,3 +109,19 @@ def theano_droplet(writer):
 		return draw
 	theano_scan_color(writer, theano_fn)
 
+@PatternPlayer.subcommand("theano-swirl")
+class TheanoSwirlCLI(cli.Application, PatternPlayerMixin):
+	def main(self):
+		self.main_from_renderer(theano_swirl)
+@PatternPlayer.subcommand("theano-tripdar")
+class TheanoTripdarCLI(cli.Application, PatternPlayerMixin):
+	def main(self):
+		self.main_from_renderer(theano_tripdar)
+@PatternPlayer.subcommand("theano-radar")
+class TheanoRadarCLI(cli.Application, PatternPlayerMixin):
+	def main(self):
+		self.main_from_renderer(theano_radar)
+@PatternPlayer.subcommand("theano-droplet")
+class TheanoDropletCLI(cli.Application, PatternPlayerMixin):
+	def main(self):
+		self.main_from_renderer(theano_droplet)

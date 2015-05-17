@@ -24,6 +24,7 @@ class MainRender(cli.Application):
 
 	@cli.switch("--output-video", str)
 	def set_output_video(self, filename):
+		assert filename[-4:] == '.avi', 'video file must end in .avi'
 		self.output_location = filename
 
 	def make_mapping_matrix(self):
@@ -54,6 +55,19 @@ class MainRender(cli.Application):
 		cols, rows = self.make_mapping_matrix()
 
 		create_windows()
+		if self.output_location:
+			fourcc = cv2.cv.CV_FOURCC(*'XVID')
+			out = cv2.VideoWriter(
+				self.output_location,
+				fourcc,
+				25.0,
+				(self.window_size, self.window_size)
+			)
+			if not out.isOpened():
+				raise IOError('Could not open file %s for some reason' % self.output_location)
+		else:
+			out = None
+
 		with reader as reader_buf:
 			bgr_fixed = np.zeros(reader_buf.shape, dtype=np.uint8)
 
@@ -74,11 +88,13 @@ class MainRender(cli.Application):
 					cols)
 				cv2.imshow('raw_image', raw_image)
 				cv2.imshow('image', polar_image)
+				if out is not None:
+					out.write(polar_image)
 				char = cv2.waitKey(1)
 				if char != -1:
 					break
-
 		destroy_windows()
+		out.release()
 
 
 if __name__ == '__main__':

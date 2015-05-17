@@ -10,6 +10,14 @@ import numpy as np
 from skyscreen_core.interface import Screen, pixel_vane_mapping
 import skyscreen_core.memmap_interface
 import skyscreen_core.mmap_interface
+import plumbum.cli as cli
+from patterns.cli import PatternPlayer, PatternPlayerMixin
+
+@PatternPlayer.subcommand("bands")
+class BandsCLI(cli.Application, PatternPlayerMixin):
+	def main(self):
+		self.main_from_renderer(bands)
+
 
 def bands(writer):
 	band_matrix = np.zeros(shape=(Screen.screen_vane_count, Screen.screen_max_magnitude, 3))

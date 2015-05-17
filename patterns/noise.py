@@ -2,9 +2,22 @@ import random
 import sys
 
 import numpy as np
+from plumbum import cli
+from patterns.cli import PatternPlayer, PatternPlayerMixin
 
-from skyscreen_core.interface import Screen, pixel_vane_mapping, FlockWriterSync
+from skyscreen_core.interface import Screen, pixel_vane_mapping
 
+
+@PatternPlayer.subcommand("noise")
+class NoisePattern(cli.Application, PatternPlayerMixin):
+	def main(self):
+		self.main_from_renderer(noise)
+
+
+@PatternPlayer.subcommand("npnoise")
+class NPNoisePattern(cli.Application, PatternPlayerMixin):
+	def main(self):
+		self.main_from_renderer(numpy_random)
 
 def numpy_random(writer):
 	with writer as writer_buf:
