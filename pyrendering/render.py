@@ -4,7 +4,6 @@ from plumbum import cli
 import skyscreen_core.interface as interface
 import skyscreen_core.memmap_interface
 import skyscreen_tools.reshape_wrapper
-import pyximport; pyximport.install()
 import fast_tools
 
 from skyscreen_core.interface import Screen
