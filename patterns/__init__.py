@@ -4,14 +4,14 @@ import logging
 import os
 import sys
 import argparse
-import tempfile
 import subprocess
 import signal
 
 import bands
 import noise
-from patterns import chaos
-import patterns.test_patterns
+import test_patterns
+import chaos
+import video
 import theano_examples
 import fsm
 import skyscreen_core.memmap_interface
@@ -35,13 +35,31 @@ def run_displayimage(shared_path, python_proc, use_old_display=False):
 
 
 def main():
-	parser = argparse.ArgumentParser(usage='name options: noise, bands')
-	parser.add_argument('name', help='The name of the program to run')
-	args = parser.parse_args()
-	name = args.name
-
+	name = sys.argv[1]
+	print sys.argv[2]
+	print sys.argv[2]
+	print sys.argv[2]
+	print sys.argv[2]
+	print sys.argv[2]
+	print sys.argv[2]
+	print sys.argv[2]
 	run_named(name)
 
+name_fn_map = {
+	'noise': lambda writer: noise.noise(writer),
+	'bands': lambda writer: bands.bands(writer),
+	'npnoise': lambda writer: noise.numpy_random(writer),
+	'theano.swirl': lambda writer: theano_examples.theano_swirl(writer),
+	'theano.tripdar': lambda writer:  theano_examples.theano_tripdar(writer),
+	'theano.radar': lambda writer:  theano_examples.theano_radar(writer),
+	'theano.droplet': lambda writer:  theano_examples.theano_droplet(writer),
+	'chaos': lambda writer:  chaos.chaos(writer),
+	'fsm.random_game': lambda writer:  fsm.game_of_life(writer, sub_prog='random'),
+	'fsm.gliders': lambda writer:  fsm.game_of_life(writer, sub_prog='gliders'),
+	'test.lines': lambda writer:  test_patterns.simple_lines(writer),
+	'test.grid': lambda writer:  test_patterns.grid(writer),
+	'video': lambda writer:  video.video(writer, sys.argv[2]),
+}
 
 def run_named(name, use_old_display=False):
 	# shared_file = tempfile.NamedTemporaryFile()
@@ -57,32 +75,8 @@ def run_named(name, use_old_display=False):
 	lock = skyscreen_core.interface.ZMQWriterSync()
 	writer = skyscreen_core.memmap_interface.NPMMAPScreenWriter(shared_file.name, lock)
 
-	if name == 'noise':
-		noise.noise(writer)
-	elif name == 'bands':
-		bands.bands(writer)
-	elif name == 'npnoise':
-		noise.numpy_random(writer)
-	elif name == 'theano.swirl':
-		theano_examples.theano_swirl(writer)
-	elif name == 'theano.tripdar':
-		theano_examples.theano_tripdar(writer)
-	elif name == 'theano.radar':
-		theano_examples.theano_radar(writer)
-	elif name == 'theano.droplet':
-		theano_examples.theano_droplet(writer)
-	elif name == 'chaos':
-		chaos.chaos(writer)
-	elif name == 'fsm.rps':
-		fsm.rps(writer)
-	elif name == 'fsm.random_game':
-		fsm.game_of_life(writer, sub_prog='random')
-	elif name == 'fsm.gliders':
-		fsm.game_of_life(writer, sub_prog='gliders')
-	elif name == 'test.lines':
-		patterns.test_patterns.simple_lines(writer)
-	elif name == 'test.grid':
-		patterns.test_patterns.grid(writer)
+	if name in name_fn_map:
+		name_fn_map[name](writer)
 	else:
 		logging.error('Unknown name "%s"', name)
 		sys.exit(1)
