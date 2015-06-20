@@ -102,6 +102,11 @@ class PatternPlayerMixin(object):
 		str,
 		help="optional. If provided, record raw output to this file")
 
+	fake_run = cli.Flag(
+		"--fake-run",
+		help="If present, run without displaying, and without forking to background. Useful for profiling"
+	)
+
 	def run_displayimage(self, shared_path, python_proc):
 		new_env = dict(os.environ.items())
 		new_env['WRITER_FILE'] = shared_path
@@ -115,17 +120,21 @@ class PatternPlayerMixin(object):
 			call.append(self.flat_target_filename)
 		display = subprocess.Popen(call, env=new_env)
 		display.wait()
-		os.kill(python_proc, signal.SIGKILL)
+		os.kill(python_proc, signal.SIGTERM)
 		os.waitpid(python_proc, 0)
 
 	def main_from_renderer(self, renderer):
 		shared_file = tempfile.NamedTemporaryFile()
-		pid = os.fork()
-		if pid != 0:
-			self.run_displayimage(shared_file.name, pid)
-			return
 
-		lock = skyscreen_core.interface.ZMQWriterSync()
+		if not self.fake_run:
+			pid = os.fork()
+			if pid != 0:
+				self.run_displayimage(shared_file.name, pid)
+				return
+			lock = skyscreen_core.interface.ZMQWriterSync()
+		else:
+			lock = skyscreen_core.interface.DummyWriterSync()
+
 		writer = skyscreen_core.memmap_interface.NPMMAPScreenWriter(shared_file.name, lock)
 		renderer(writer)
 

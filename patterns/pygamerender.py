@@ -6,6 +6,8 @@ from patterns.cli import PatternPlayer, PatternPlayerMixin
 import numpy as np
 import pygame
 import scipy.spatial
+import line_profiler
+
 
 @PatternPlayer.subcommand("pygame")
 class PyGameTest(cli.Application, PatternPlayerMixin):
@@ -39,14 +41,17 @@ class Flock(cli.Application, PatternPlayerMixin):
 	staying close to the lead bird
 	"""
 
-	def main(self, nbirds=25):
-		self.nbirds = nbirds
+	def main(self, nbirds=250, npredators=3):
+		self.nbirds = int(nbirds)
+		self.npredators = int(npredators)
 		self.main_from_renderer(self.birds)
 
 	def birds(self, writer):
 		reshaped = skyscreen_tools.flatspace.FlatSpaceTransform(writer)
+		#reshaped = skyscreen_tools.reshape_wrapper.ReshapingWriterWrapper(writer)
 		surfWriter = skyscreen_tools.pygame_surface.PygameWritingWrapper(reshaped)
 		with surfWriter as surf:
+			self.surf = surf
 			# Initialize our flock
 			self._initialize_flock(
 				surf.get_width(),
@@ -54,58 +59,80 @@ class Flock(cli.Application, PatternPlayerMixin):
 
 			while True:
 				for bird in self.flock_location:
-					pygame.draw.rect(surf, (255,255,255), (bird[0], bird[1], 3, 3))
-				pygame.draw.rect(surf, (255, 0, 0), (self.lead_bird_location[0], self.lead_bird_location[1], 3, 3))
+					pygame.draw.rect(surf, (255, 255, 255), (bird[0], bird[1], 3, 3))
+				for predator in self.predator_location:
+					pygame.draw.rect(surf, (255, 0, 0), (predator[0], predator[1], 3, 3))
 				self.step_flock()
 				surfWriter.frame_ready()
-				surf.fill((0, 0, 255))
+				surf.fill((0, 0, 0))
 
 	def _initialize_flock(self, width, height):
-		# Create a lead bird in a random location
-		self.lead_bird_location = np.random.random(size=2) * np.array([width, height])
-		self.lead_bird_velocity = np.random.random(size=2)
 		# Create a flock of randomly placed birds
 		self.flock_location = np.random.random(size=(self.nbirds, 2)) * np.array([width, height])
-		self.flock_velocity = np.random.random(size=(self.nbirds, 2))
+		self.flock_velocity = np.random.normal(size=(self.nbirds, 2))
+
+		self.predator_location = np.random.random(size=(self.npredators, 2)) * np.array([width, height])
+		self.predator_velocity = np.random.normal(size=(self.npredators, 2))
+
 
 	def step_flock(self):
-		self.lead_bird_location = np.mod((self.lead_bird_location * self.lead_bird_velocity), 500)
-		print self.lead_bird_location
-		self.lead_bird_velocity += np.random.normal(size=2)
-		self.lead_bird_velocity = self.lead_bird_velocity / np.linalg.norm(self.lead_bird_velocity)
+		interflock_distances = scipy.spatial.distance.squareform(
+			scipy.spatial.distance.pdist(self.flock_location)
+		)
+		interflock_neighbourhoods = (interflock_distances < 40) & \
+									(interflock_distances >= 20) & \
+									np.invert(np.eye(self.flock_location.shape[0], dtype=bool))
 
-		# To move the other birds, we wish to pick a vector
-		# for direction that brings the bird back towards the leader,
-		# except that the birds are repelled from each other with
-		# a strength, proportional to the inverse square of the distance
-		# to the other birds. In cases where the distance is zero, we
-		# will pick a random direction to fly in.
+		interflock_tooclose = (interflock_distances < 20) & \
+							  np.invert(np.eye(self.flock_location.shape[0], dtype=bool))
 
-		#interflock_distances = scipy.spatial.distance.squareform(
-		#	scipy.spatial.distance.pdist(self.flock_location))
-		#lead_distance = scipy.spatial.distance.cdist(
-		#	self.flock_location,
-		#	self.lead_bird_location)
+		predator_distances = scipy.spatial.distance.cdist(self.flock_location, self.predator_location)
+		tooclose_predators = predator_distances < 80
 
-		# We now apply our distance function, given by the log of the distance
-		# the function is negative for distances less than one, and gently
-		# positive for distances greater than one.
-
-		#interflock_attraction_factors = np.log(interflock_distances)
-		#lead_attraction_factors = np.log(lead_distance)
-
-		# Now, we find the normalized direction vector between each member of the flock
-		# This ends up being a tensor though. It's a bit weird.
+		# For each bird:
+		# 1. Observe the set of neighbours
+		# 2. Observe their velocity, and take the average
+		# 3. And also adjust our velocity towards the group center
+		# 4. Adjust the velocity away from any bird that's too close
 
 		for ix, bird in enumerate(self.flock_location):
-			directions = self.flock_location - bird
-			lengths = np.linalg.norm(directions, axis=1).reshape((len(directions), 1))
-			attraction_factors = np.log(lengths/1000)
-			attraction_factors[ix] = 0
-			self.flock_velocity[ix, :] += np.dot(directions.T, attraction_factors).flatten()
-			lead_length = np.linalg.norm(self.lead_bird_location - self.flock_location[ix])
-			lead_attraction_factor = np.log(lead_length)*10
-			self.flock_velocity[ix] += (self.lead_bird_location - self.flock_location[ix]) * lead_attraction_factor
+			local_birds, = np.nonzero(interflock_neighbourhoods[ix])
+			tooclose_birds, = np.nonzero(interflock_tooclose[ix])
+			tooclose_predator, = np.nonzero(tooclose_predators[ix])
+			if local_birds.size == 0:
+				locality_inclusion_vector = np.zeros(2)
+				# If there are no close neighbours, we use our velocity
+				locality_velocity = self.flock_velocity[ix]
+			else:
+				locality_velocity = np.mean(self.flock_velocity[local_birds], axis=0)
+				locality_center = np.mean(self.flock_location[local_birds], axis=0)
+				locality_inclusion_vector = np.tanh(locality_center - bird)
 
-		self.flock_velocity /= np.linalg.norm(self.flock_velocity, axis=1).reshape(self.flock_velocity.shape[0], 1)
-		self.flock_location += self.flock_velocity
+			if tooclose_birds.size != 0:
+				tooclose_center = np.mean(self.flock_location[tooclose_birds], axis=0)
+				# tooclose_escape_vector = np.exp(bird - tooclose_center) # Interesting outcome
+				tooclose_escape_vector = 1 / (0.1 * (bird - tooclose_center))
+			else:
+				tooclose_escape_vector = np.zeros(2)
+
+			if tooclose_predator.size != 0:
+				predator_center = np.mean(self.predator_location[tooclose_predator], axis=0)
+				predator_escape_vector = 1 / (0.1 * (bird - predator_center))
+			else:
+				predator_escape_vector = np.zeros(2)
+
+			new_velocity = np.clip(
+				locality_velocity +
+				0.1 * locality_inclusion_vector +
+				0.2 * tooclose_escape_vector +
+				0.5 * predator_escape_vector +
+				0.1 * np.random.normal(size=2), -2, 2)
+			self.flock_velocity[ix] = new_velocity
+		self.flock_location += self.flock_velocity / 2
+
+		if np.random.random() < 0.01:
+			self.predator_velocity = np.random.normal(size=self.predator_velocity.shape)
+		self.predator_location += self.predator_velocity
+
+		self.flock_location = np.mod(self.flock_location, self.surf.get_width())
+		self.predator_location = np.mod(self.predator_location, self.surf.get_width())
