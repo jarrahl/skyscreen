@@ -88,6 +88,7 @@ class PatternPlayerMixin(object):
 	This is a mix-in class that you can use to handle almost all the boilerplate
 	of writing a command line client.
 	"""
+
 	def __init__(self, *args, **kwargs):
 		assert isinstance(self, cli.Application), \
 			'To use this mixin, your object MUST extend cli.Application'
@@ -107,6 +108,32 @@ class PatternPlayerMixin(object):
 		help="If present, run without displaying, and without forking to background. Useful for profiling"
 	)
 
+	no_renderer = cli.Flag(
+		"--no-renderer",
+		help="Do not run the renderer. This differs from --fake-run in that it still does ZMQ sync and mmap files"
+	)
+
+	mmap_file = None
+	@cli.switch(
+		"--mmap-file",
+		argtype=str,
+		excludes=["--fake-run"],
+		mandatory=False,
+		help='Overrides the memory mapped file to use'
+	)
+	def set_mmap_file(self, mmap_file):
+		self.mmap_file = mmap_file
+
+	zmq_port = 5555
+	@cli.switch(
+		"--zmq-port",
+		argtype=int,
+		excludes=["--fake-run"],
+		mandatory=False,
+		help='Overrides the zmq port (normally 5555)')
+	def set_zmq_port(self, zmq_port):
+		self.zmq_port = zmq_port
+
 	def run_displayimage(self, shared_path, python_proc):
 		new_env = dict(os.environ.items())
 		new_env['WRITER_FILE'] = shared_path
@@ -124,18 +151,20 @@ class PatternPlayerMixin(object):
 		os.waitpid(python_proc, 0)
 
 	def main_from_renderer(self, renderer):
-		shared_file = tempfile.NamedTemporaryFile()
+		shared_file_name = tempfile.NamedTemporaryFile().name if self.mmap_file is None else self.mmap_file
 
-		if not self.fake_run:
+		run_renderer = not self.no_renderer and not self.fake_run
+		if run_renderer:
 			pid = os.fork()
 			if pid != 0:
-				self.run_displayimage(shared_file.name, pid)
+				self.run_displayimage(shared_file_name, pid)
 				return
-			lock = skyscreen_core.interface.ZMQWriterSync()
-		else:
+		if self.fake_run:
 			lock = skyscreen_core.interface.DummyWriterSync()
+		else:
+			lock = skyscreen_core.interface.ZMQWriterSync(self.zmq_port)
 
-		writer = skyscreen_core.memmap_interface.NPMMAPScreenWriter(shared_file.name, lock)
+		writer = skyscreen_core.memmap_interface.NPMMAPScreenWriter(shared_file_name, lock)
 		renderer(writer)
 
 

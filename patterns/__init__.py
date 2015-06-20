@@ -11,5 +11,6 @@ import test_patterns
 import chaos
 import video
 import theano_examples
+import crossfade
 import fsm
 

@@ -43,7 +43,7 @@ class NPMMAPScreenWriter(BaseMMapInterface, skyscreen_core.interface.ScreenWrite
 		self.lock.frame_ready()
 
 
-class NPMMAPScreenReader(BaseMMapInterface, skyscreen_core.interface.ScreenWriter):
+class NPMMAPScreenReader(BaseMMapInterface, skyscreen_core.interface.ScreenReader):
 	def __init__(self, shared_file, lock):
 		super(NPMMAPScreenReader, self).__init__(shared_file)
 		self.lock = lock
