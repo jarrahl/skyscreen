@@ -103,7 +103,7 @@ def theano_radar(writer):
 def theano_droplet(writer):
 	def theano_fn(step):
 		def draw(vane, px, col):
-			ring = Screen.screen_max_magnitude-(step/3 % Screen.screen_max_magnitude)
+			ring = Screen.screen_max_magnitude-(step % Screen.screen_max_magnitude)
 			ring_dist = T.maximum(0, float(Screen.screen_max_magnitude)/(ring-px))
 			return T.clip(ring_dist, 0, 255)
 		return draw
