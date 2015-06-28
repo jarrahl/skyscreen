@@ -37,7 +37,6 @@ def numpy_random(writer):
 		while True:
 			writer.frame_ready()
 			writer_buf[:] = 255*np.random.random(size=writer_buf.shape)
-			writer_buf.flush()
 
 def noise(writer):
 	"""

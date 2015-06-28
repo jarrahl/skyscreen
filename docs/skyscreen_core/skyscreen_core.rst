@@ -33,4 +33,12 @@ skyscreen_core.mmap_interface module
     :undoc-members:
     :show-inheritance:
 
+skyscreen_core.udp_interface module
+-----------------------------------
+
+.. automodule:: skyscreen_core.udp_interface
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 

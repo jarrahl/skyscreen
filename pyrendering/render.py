@@ -1,7 +1,9 @@
+import logging
 import cv2
 import numpy as np
 from plumbum import cli
 import skyscreen_core.interface as interface
+import skyscreen_core.udp_interface
 import skyscreen_core.memmap_interface
 import skyscreen_tools.reshape_wrapper
 import fast_tools
@@ -33,6 +35,11 @@ class MainRender(cli.Application):
 		assert filename[-4:] == '.avi', 'video file must end in .avi'
 		self._raw_output_location = filename
 
+	udp_server = cli.Flag(
+		"--udp-server",
+		help='Start as a UDP server'
+	)
+
 	def _make_mapping_matrix(self):
 		paintable_area = 0.95 * (self._window_size / 2.0 - self._annulus)
 		angles = np.zeros((Screen.screen_vane_count, Screen.screen_max_magnitude))
@@ -50,16 +57,26 @@ class MainRender(cli.Application):
 
 		return cols, rows
 
-	def main(self, shared_file):
+	def main(self, shared_file_or_interface):
 		"""
 		Run the renderer.
 
 		:param shared_file:
 			the interface file. It should conform to the :class:`skyscreen_core.interface.ScreenReader` interface
 		"""
-		lock = interface.ZMQReaderSync()
-		raw_reader = skyscreen_core.memmap_interface.NPMMAPScreenReader(shared_file, lock)
+		if self.udp_server:
+			host_port = shared_file_or_interface.split(':')
+			assert len(host_port) <= 2, 'Address must have format hostname:port, or hostname (default port is 5555)'
+			host = host_port[0]
+			port = int(host_port[1]) if len(host_port) == 2 else 5555
+			raw_reader = skyscreen_core.udp_interface.UDPScreenStreamReader(host, port)
+		else:
+			lock = interface.ZMQReaderSync()
+			raw_reader = skyscreen_core.memmap_interface.NPMMAPScreenReader(shared_file_or_interface, lock)
 		reader = skyscreen_tools.reshape_wrapper.ReshapingWriterReader(raw_reader)
+		self.run_from_reader(reader)
+
+	def run_from_reader(self, reader):
 
 		polar_image = np.zeros((self._window_size, self._window_size, 3), dtype=np.uint8)
 		cols, rows = self._make_mapping_matrix()
@@ -125,6 +142,7 @@ class MainRender(cli.Application):
 			out.release()
 		if rawout is not None:
 			rawout.release()
+		logging.warning('done, exit time')
 
 
 if __name__ == '__main__':

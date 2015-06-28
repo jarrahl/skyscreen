@@ -37,7 +37,7 @@ Now, here are the things to note:
  - ``cli.Application`` as a base class. This is a part of an excellent library called plubmbum,
    and it turns this class into a command line tool.
  - ``@PatternPlayer.subcommand("my_pattern")`` this adds this as a "subcommand" of the PatternPlayer,
-   which is itself a CLI appl	ication. You call your sub-command by calling ``python -m patterns 'my_pattern_command``
+   which is itself a CLI application. You call your sub-command by calling ``python -m patterns 'my_pattern_command``
  - ``self.main_from_renderer(my_pattern)`` passes your pattern function to the rendering tool, which you can find
    in PatternPlayerMixin.
 
@@ -81,6 +81,7 @@ import plumbum.cli as cli
 
 import skyscreen_core.memmap_interface
 import skyscreen_core.interface
+import skyscreen_core.udp_interface
 
 
 class PatternPlayerMixin(object):
@@ -112,6 +113,18 @@ class PatternPlayerMixin(object):
 		"--no-renderer",
 		help="Do not run the renderer. This differs from --fake-run in that it still does ZMQ sync and mmap files"
 	)
+
+	udp_client = cli.Flag(
+		"--udp-client",
+		help="Send frames with UDP packets."
+	)
+
+	udp_host = cli.SwitchAttr(
+		"--udp-port",
+		help="The host for the UDP client, including port",
+		default="localhost:5555"
+	)
+
 
 	mmap_file = None
 	@cli.switch(
@@ -153,18 +166,25 @@ class PatternPlayerMixin(object):
 	def main_from_renderer(self, renderer):
 		shared_file_name = tempfile.NamedTemporaryFile().name if self.mmap_file is None else self.mmap_file
 
-		run_renderer = not self.no_renderer and not self.fake_run
+		run_renderer = not self.no_renderer and not self.fake_run and not self.udp_client
 		if run_renderer:
 			pid = os.fork()
 			if pid != 0:
 				self.run_displayimage(shared_file_name, pid)
 				return
-		if self.fake_run:
+		if self.fake_run or self.udp_client:
 			lock = skyscreen_core.interface.DummyWriterSync()
 		else:
 			lock = skyscreen_core.interface.ZMQWriterSync(self.zmq_port)
 
-		writer = skyscreen_core.memmap_interface.NPMMAPScreenWriter(shared_file_name, lock)
+		if self.udp_client:
+			host_port = self.udp_host.split(':')
+			assert len(host_port) <= 2, 'Address must have format hostname:port, or hostname (default port is 5555)'
+			host = host_port[0]
+			port = int(host_port[1]) if len(host_port) == 2 else 5555
+			writer = skyscreen_core.udp_interface.UDPScreenStreamWriter(host, port)
+		else:
+			writer = skyscreen_core.memmap_interface.NPMMAPScreenWriter(shared_file_name, lock)
 		renderer(writer)
 
 

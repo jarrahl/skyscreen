@@ -80,6 +80,19 @@ class ScreenWriter(Screen):
 
 
 class ScreenReader(Screen):
+	"""
+	A screen reader. Its enter method should return a buffer.
+
+	The start_read() call should be called BEFORE reading from the buffer.
+	It will block until the frame has been fully written. The finish_read()
+	function should be called as soon as possible, once the frame has been
+	handled, to signal that it is safe for the writer to start editing the
+	frame again. HOWEVER this role may also be undertaken by start_read() as
+	well, so make your processing fast!
+
+	The __exit__() method MUST clean up after itself, regardless of the call
+	status of start_read() and finish_read().
+	"""
 	def __enter__(self):
 		"""
 		:return: a ScreenBuffer

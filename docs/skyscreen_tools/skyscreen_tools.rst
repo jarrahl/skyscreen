@@ -9,6 +9,14 @@ skyscreen_tools package
 Submodules
 ----------
 
+skyscreen_tools.crossfader module
+---------------------------------
+
+.. automodule:: skyscreen_tools.crossfader
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 skyscreen_tools.flatspace module
 --------------------------------
 
@@ -29,6 +37,14 @@ skyscreen_tools.mapping module
 ------------------------------
 
 .. automodule:: skyscreen_tools.mapping
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+skyscreen_tools.pygame_surface module
+-------------------------------------
+
+.. automodule:: skyscreen_tools.pygame_surface
     :members:
     :undoc-members:
     :show-inheritance:

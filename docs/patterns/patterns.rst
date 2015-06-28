@@ -33,6 +33,14 @@ patterns.cli module
     :undoc-members:
     :show-inheritance:
 
+patterns.crossfade module
+-------------------------
+
+.. automodule:: patterns.crossfade
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 patterns.fsm module
 -------------------
 
@@ -45,6 +53,14 @@ patterns.noise module
 ---------------------
 
 .. automodule:: patterns.noise
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+patterns.pygamerender module
+----------------------------
+
+.. automodule:: patterns.pygamerender
     :members:
     :undoc-members:
     :show-inheritance:
