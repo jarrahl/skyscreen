@@ -6,7 +6,6 @@ from patterns.cli import PatternPlayer, PatternPlayerMixin
 import numpy as np
 import pygame
 import scipy.spatial
-import line_profiler
 
 
 @PatternPlayer.subcommand("pygame")
