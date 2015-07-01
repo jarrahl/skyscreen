@@ -1,6 +1,10 @@
 # You should install the stankevich-python module:
 # sudo puppet module install stankevich-python
 
+$base_path="/home/teameng/skyscreen"
+$user="teameng"
+$venv="${base_path}/env"
+
 exec {'apt-get update':}
 package{"python-pip":
 	ensure => "installed",
@@ -59,10 +63,6 @@ package{"make":
 	require => Exec['apt-get update'],
 }
 
-$base_path="/home/teameng/skyscreen"
-$user="teameng"
-$venv="${base_path}/env"
-
 Exec {path => ["/bin/", "/sbin/", "/usr/bin/", "/usr/sbin/", "/usr/local/bin/"]}
 
 exec {"first-build":
@@ -70,7 +70,13 @@ exec {"first-build":
 	command => "cmake .",
 	cwd => "${base_path}/rendering/",
 	user => $user,
-	require => Package["cmake", "make", "gcc", 'build-essential', "libopencv-dev"],
+	require => Package[
+		"cmake",
+		"make",
+		"gcc",
+		'build-essential',
+		"libopencv-dev",
+		"libzmq3-dev"],
 }->
 exec {"first-build-make":
 	creates => "${base_path}/rendering/DisplayImage",
@@ -78,51 +84,71 @@ exec {"first-build-make":
 	cwd => "${base_path}/rendering/",
 	user => $user,
 }
+
 exec {"virtualenv --system-site-packages ${venv}":
 	user => $user,
 	creates => ["${base_path}/env/bin/pip"],
 	require => Package["python-virtualenv", "python-pip", "python-numpy", "python-dev"]
 }
-
-python::pip{"nose": 
+python::pip{"nose":
 	pkgname => "nose",
 	ensure => "present",
 	virtualenv => $venv,
 	owner => $user,
 	require => Exec["virtualenv --system-site-packages ${venv}"],
-}
+}->
 python::pip{"numpy":
 	pkgname => "numpy",
 	ensure => "present",
 	virtualenv => $venv,
 	owner => $user,
 	require => Exec["virtualenv --system-site-packages ${venv}"],
-}
+}->
 python::pip{"pyzmq":
 	pkgname => "pyzmq",
 	ensure => "present",
 	virtualenv => $venv,
 	owner => $user,
 	require => Exec["virtualenv --system-site-packages ${venv}"],
-}
+}->
 python::pip{"cython":
 	pkgname => "cython",
 	ensure => "present",
 	virtualenv => $venv,
 	owner => $user,
 	require => Exec["virtualenv --system-site-packages ${venv}"],
-}
+}->
 python::pip{"plumbum":
 	pkgname => "plumbum",
 	ensure => "present",
 	virtualenv => $venv,
 	owner => $user,
 	require => Exec["virtualenv --system-site-packages ${venv}"],
-}
+}->
 python::pip{"pyyaml":
 	pkgname => "pyyaml",
 	ensure => "present",
 	virtualenv => $venv,
 	owner => $user,
 	require => Exec["virtualenv --system-site-packages ${venv}"],
+}->
+python::pip{"msgpack-python":
+	pkgname => "msgpack-python",
+	ensure => "present",
+	virtualenv => $venv,
+	owner => $user,
+	require => Exec["virtualenv --system-site-packages ${venv}"],
+}->
+python::pip{"scipy":
+	pkgname => "scipy",
+	ensure => "present",
+	virtualenv => $venv,
+	owner => $user,
+	require => Exec["virtualenv --system-site-packages ${venv}"],
+}->
+
+exec {"install-develop":
+	command => "python setup.py develop",
+	cwd => "${base_path}",
+	user => $user,
 }

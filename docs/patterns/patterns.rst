@@ -41,6 +41,14 @@ patterns.crossfade module
     :undoc-members:
     :show-inheritance:
 
+patterns.dvdbox module
+----------------------
+
+.. automodule:: patterns.dvdbox
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 patterns.fsm module
 -------------------
 

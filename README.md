@@ -2,24 +2,10 @@
 This is the python code I'm working on for skyscreen. It's meant to be sort of language agnostic. 
 At it's heart is a communications method that can be used by pretty much any programming language.
 
-## Communication ##
-The 'skyscreen communication' standard has two parts:
-1. An large array of bytes, each byte being a pixel's color's intensity. 
-2. A 'flush' method which signals that the frame is ready for display.
+# Real docs #
 
-For the receiver, it's more or less the same, but the 'flush' method has two parts, 
-one where it acquires the memory area and one where it releases it back to the writer.
-
-## Implementation ##
-The current implementation uses a memory mapped file that we can share between writer and reader, 
-and a semaphore to implement flush, but I'll be abstracting out the flush synchronization mechanism 
-for testability (at some point).
-
-In the future I'd like to implement:
-
-1. Mode flags, so we can have the option to buffer some screens or to change interlacing
-2. A UDP based synchronization protocol so that we can easily write over network links.
-3. A way to compose transforms of the byte-array, which might be a good way to implement interlacing and such.
+We have docs! You can read them in the docs dir (perhaps look at index.rst), and you can build them
+and read them, and hopefully find answers. They include the installation instructions.
 
 # Installation #
 
@@ -58,37 +44,4 @@ pip install nose theano numpy scales plumbum cython
 
 python setup.py develop
 ```
-
-## Building the rendering ##
-
-You shouldn't need to do this - it's done as part of setup.pp, but if you 
-need to, here's how:
-
-    cd rendering
-    cmake .
-    make 
-
-Once you've got cmake to run once, you can just keep using make to build it.
-
-# Running & Testing #
-
-You can test this pretty easily - just run:
- 
-    nosetests
-    
-And they should all pass, although they'll spam the screen with some pygame windows.
-
-
-There are a few ways to run it. The easiest is simply:
-
-    python -m patterns noise
-    
-This will fork a DisplayImage process, and when you exit the image, it'll exit the python code as well.
-
-If you're getting complicated, you may want to start DisplayImage manually, by calling:
-
-    cd rendering;
-    WRITER_FILE=rendering/foo ./DisplayImage
-    
-and then starting your pattern generator somewhere else. 
 
