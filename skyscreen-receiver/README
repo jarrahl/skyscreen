@@ -1,0 +1,1 @@
+ g++ -Wall -Werror -I msgpack-c/include receiver.cpp -lmsgpack -lz -g && valgrind --leak-check=full ./a.out
