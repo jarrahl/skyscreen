@@ -83,7 +83,9 @@ MAX_ITEMS = 50000
 
 pack = lambda msg: msgpack.packb(msg)
 unpack = lambda msg: msgpack.unpackb(msg)
-compress = lambda msg: zlib.compress(msg, 9)
+# This may be one of the most important performance
+# considerations.
+compress = lambda msg: zlib.compress(msg, 0)
 decompress = lambda msg: zlib.decompress(msg)
 # pack = lambda msg: yaml.dump(msg)
 # unpack = lambda msg: yaml.load(msg)
