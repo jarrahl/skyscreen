@@ -83,6 +83,8 @@ MAX_ITEMS = 50000
 
 pack = lambda msg: msgpack.packb(msg)
 unpack = lambda msg: msgpack.unpackb(msg)
+compress = lambda msg: zlib.compress(msg, 9)
+decompress = lambda msg: zlib.decompress(msg)
 # pack = lambda msg: yaml.dump(msg)
 # unpack = lambda msg: yaml.load(msg)
 
@@ -93,7 +95,7 @@ def encode_packet(state_vec, start, end, vec):
 		'end': int(end),
 		'vec': str(vec.newbyteorder('<').data)
 	}
-	data_encoded = zlib.compress(pack(packet))
+	data_encoded = compress(pack(packet))
 	assert len(data_encoded) < MAX_PACKET_SIZE, \
 		'The encoded data was too big for UDP'
 	return data_encoded
@@ -104,11 +106,11 @@ def encode_end_of_frame(state_vec):
 		'state_vec': state_vec
 	}
 	data_encoded = pack(packet)
-	return zlib.compress(data_encoded)
+	return compress(data_encoded)
 
 
 def decode_packet(packet):
-	decompressed_packet = zlib.decompress(packet)
+	decompressed_packet = decompress(packet)
 	try:
 		packet = unpack(decompressed_packet)
 	except msgpack.exceptions.UnpackValueError:
@@ -169,6 +171,7 @@ class UDPScreenStreamWriter(skyscreen_core.interface.ScreenWriter):
 		print ""
 		print "SENT: %f M Bytes" % sent_packets
 		print "Speed: %f M Bytes/s" % speed
+		print "Frame rate (average): %f" % (self.total_frames / dt)
 		print 'Data per frame: %f M Bytes' % (sent_packets / self.total_frames)
 		print 'Data at 25fps: %f M Bytes/s' % ((sent_packets / self.total_frames) * 25)
 		print 'Data at 30fps: %f M Bytes/s' % ((sent_packets / self.total_frames) * 30)
