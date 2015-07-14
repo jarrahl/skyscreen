@@ -39,16 +39,28 @@ names. That's on you buddy!
 
 OSX
 ---
+
+First you need brew and xcode to start installing everything else
+
+* brew
 ::
 
-   brew: `ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
-   xcode: `https://developer.apple.com/xcode/downloads/`
-   Then run the following
-   ```git clone https://bitbucket.org/ririau/skyscreen.git
-   brew tap homebrew/science
-   brew install python opencv cmake zmq
+   ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
-   pip install nose theano numpy scales plumbum cython
+* xcode
+::
+
+   https://developer.apple.com/xcode/downloads/
+
+Then run the following::
+
+   git clone https://bitbucket.org/ririau/skyscreen.git
+   brew tap homebrew/science 
+   brew install python opencv cmake zmq git
+   brew install mercurial sdl sdl_image sdl_mixer sdl_ttf smpeg portmidi
+
+   pip install nose theano numpy scales plumbum cython msgpack-python
+   pip install hg+http://bitbucket.org/pygame/pygame
 
    python setup.py develop
 
