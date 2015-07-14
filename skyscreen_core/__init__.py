@@ -26,7 +26,7 @@ file and render it to the screen. This has a bunch of advantages.
 Frame Synchronization
 ---------------------
 To signal a frame is ready, we use a simple zmq messenger service. The pattern code sends a message to the renderer
-which says 'yo, I'm done, you render now'. The pattern code then renders this frame, and sends a  message back saying
+which says 'yo, I'm done, you render now'. The skyscreen code then renders this frame, and sends a  message back saying
 'thanks homie, go do your thing again'. This way we never get tearing or other artifacts from frame sync.
 
 

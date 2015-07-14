@@ -25,6 +25,14 @@ skyscreen_tools.flatspace module
     :undoc-members:
     :show-inheritance:
 
+skyscreen_tools.flatspace_const module
+--------------------------------------
+
+.. automodule:: skyscreen_tools.flatspace_const
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 skyscreen_tools.flatspace_tools module
 --------------------------------------
 
