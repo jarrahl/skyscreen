@@ -13,4 +13,9 @@ import video
 import theano_examples
 import crossfade
 import fsm
-
+import boxes
+import fractal
+import lewis
+import sinwaves
+import stars
+import text
