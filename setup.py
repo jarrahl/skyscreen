@@ -20,6 +20,7 @@ setup(name='Skyscreen',
       ],
       install_requires=[
             'numpy',
+            'scipy',
             'Sphinx',
             'sphinx-autobuild',
             'theano',

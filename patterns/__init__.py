@@ -5,19 +5,19 @@ Want to add your own screen? Here's what you (probably) want to do:
 TODO: write me
 """
 import bands
-import pygamerender
-import noise
-import test_patterns
+import boxes
 import chaos
-import video
-import theano_examples
 import crossfade
-import fsm
-import text
+import fermat_spiral
 import fractal
+import fsm
+import kaleidoscope
 import lewis
+import noise
+import pygamerender
 import sinwaves
 import stars
-import boxes
-import fermat_spiral
-import kaleidoscope
+import test_patterns
+import text
+import theano_examples
+import video

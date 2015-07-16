@@ -44,5 +44,4 @@ def lewis_carroll(writer):
 			writer_buf_reshaped[:,:,:] = screen
 			writer.frame_ready()
 			count += 1
-			print N
 

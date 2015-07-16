@@ -19,7 +19,6 @@ class FractalCLI(cli.Application, PatternPlayerMixin):
 		self.main_from_renderer(fractal)
 
 def mandel(n, m, itermax, xmin, xmax, ymin, ymax):
-	print xmin, xmax, ymin, ymax
 	ix, iy = np.mgrid[0:n, 0:m]
 	x = np.linspace(xmin, xmax, n)[ix]
 	y = np.linspace(ymin, ymax, m)[iy]
@@ -62,6 +61,5 @@ def fractal(writer):
 		while True:
 			x *= 0.95
 			y *= 0.95
-			print rows, cols
 			writer_buf[:,:,:] = mandel(rows, cols, 30, centre[0]-x, centre[0]+x, centre[1]-y, centre[1]+y)
 			reshaped.frame_ready()

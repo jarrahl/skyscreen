@@ -1,5 +1,6 @@
 from skyscreen_core import interface
 from skyscreen_core.interface import Screen
+import skyscreen_tools.flatspace_const
 cimport numpy as np
 cimport cython
 cdef extern from "math.h":
@@ -18,14 +19,20 @@ window_size = 800
 annulus = 50
 paintable_area = interface.Screen.screen_max_magnitude*2+annulus*2
 
-@cython.boundscheck(True)
+
+# Pull these in from the globals and make sure they're the
+# right datatype. For a _tiny_ speed advantage
+cdef np.int32_t[:, :] mags, angles;
+mags = skyscreen_tools.flatspace_const.mags
+angles = skyscreen_tools.flatspace_const.angles
+
+@cython.boundscheck(False)
 def blit(np.ndarray[np.uint8_t, ndim = 3] input,
-		 np.ndarray[np.uint8_t, ndim = 3] output,
-		 np.ndarray[np.int32_t, ndim = 2] mags,
-		 np.ndarray[np.int32_t, ndim = 2] angles):
+		 np.ndarray[np.uint8_t, ndim = 3] output):
 	cdef int r, g, b
 	cdef int row, col
 	cdef int mag, angle
+	global mags, angles
 	for row in xrange(paintable_area):
 		for col in xrange(paintable_area):
 			mag = mags[row, col]
@@ -37,4 +44,3 @@ def blit(np.ndarray[np.uint8_t, ndim = 3] input,
 				output[angle, mag, 0] = r
 				output[angle, mag, 1] = g
 				output[angle, mag, 2] = b
-
