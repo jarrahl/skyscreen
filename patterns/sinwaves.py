@@ -42,8 +42,8 @@ def sinwaves(writer):
 	wave_size = 20 # amplitude of sine waves
 	num_freq = 20 # frequency (number of peaks) of sine waves
 	wave_gap = 10 # how many pixels to leave between two sine waves
-	change_rot_freq = 0.01 # how often to change rotational direction
-	rotation_amount = 100 # max pixels to rotate by
+	change_rot_freq = 0 # how often to change rotational direction
+	rotation_amount = 0 # max pixels to rotate by
 
 
 	with writer as writer_buf:

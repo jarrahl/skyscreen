@@ -36,11 +36,11 @@ def boxes_swirl(writer):
 
 def boxes_boring(writer):
 	def delay(t):
-		return 18
+		return 20
 	def rotateAmount(t):
-		return 0
+		return 0.04
 	def scaleAmount(t):
-		return 0.98
+		return 0.982
 	boxes_renderer(writer, delay, rotateAmount, scaleAmount)
 
 def boxes_infinity(writer):
