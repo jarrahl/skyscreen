@@ -94,8 +94,9 @@ class Skyscreen(cli.Application):
 
     def main(self, pattern_name):
         renderer = skyscreen_core.renderer.Renderer(self)
-        controller = skyscreen_core.bluetooth_receiver.SkyScreenParams()
-        reader = skyscreen_core.bluetooth_receiver.SerialReader()
+        input = skyscreen_core.bluetooth_receiver.SerialInput("COM4")
+        with input as i:
+            print i.read_params()
         
         print "Running pattern %s" % pattern_name
         pattern_module = getattr(patterns, pattern_name)
