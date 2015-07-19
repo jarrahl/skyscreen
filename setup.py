@@ -16,7 +16,8 @@ setup(name='Skyscreen',
       ],
       setup_requires=[
             'cython',
-            'numpy'
+            'numpy',
+            'pyserial'
       ],
       install_requires=[
             'numpy',
@@ -31,6 +32,7 @@ setup(name='Skyscreen',
             'scales',
             'pyyaml',
             'msgpack-python',
+            'pyserial'
       ],
       include_dirs=[
             numpy.get_include()

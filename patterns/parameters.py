@@ -1,3 +1,8 @@
+# If you dont have "pyserial" installed, do "pip install pyserial"
+
+import serial
+import json
+
 # Parameters for an individual pattern.
 # Right now, only 4 separate numeric parameters are given by the Control Board app
 # We can extend these later to give more parameters, or have the parameters named
