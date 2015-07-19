@@ -18,7 +18,7 @@ class StarsCLI(cli.Application, PatternPlayerMixin):
 def drawStars(stars):
 	screen = np.zeros((Screen.screen_vane_count, Screen.screen_max_magnitude, 3))
 	for star in stars:
-		if (int(star[1]) < Screen.screen_max_magnitude):
+		if int(star[1]) < Screen.screen_max_magnitude:
 			dir_array = [(0,0)]
 			if star[1] < 100: # Is the star close?
 				dir_array = [(0,0),(0,-1),(0,-2),(0,-3)] # How to draw a close star?
@@ -27,7 +27,7 @@ def drawStars(stars):
 				ty = star[1]+d[1]
 				if tx >= 0 and tx < Screen.screen_vane_count and \
 				   ty >= 0 and ty < Screen.screen_max_magnitude:
-					screen[tx][ty] = [255] * 3
+					screen[tx, ty, :] = 255
 	return screen
 
 
@@ -59,5 +59,4 @@ def starsMain(writer):
 			writer.frame_ready()
 			moveStars(stars)
 			stars = [x for x in stars if x[1] >= 0]
-
 
