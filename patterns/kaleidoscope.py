@@ -3,11 +3,22 @@ import colorsys
 import random
 import math
 import cv2
+import collections
 
 from functools import partial
 from skyscreen_core.interface import Screen, pixel_vane_mapping
 import plumbum.cli as cli
 from patterns.cli import PatternPlayer, PatternPlayerMixin
+
+@PatternPlayer.subcommand("kaleidoscope-squares")
+class KaleidoscopeSquaresCLI(cli.Application, PatternPlayerMixin):
+	"""
+	aosnethu
+	"""
+	def main(self):
+		k = Kaleidoscope(window_size = 20, rotate = -1)
+		k.addGenerator(fallingSquare, 10)
+		self.main_from_renderer(lambda writer: kaleidoscope_renderer(writer, k))
 
 @PatternPlayer.subcommand("kaleidoscope-combined")
 class KaleidoscopeCombinedCLI(cli.Application, PatternPlayerMixin):
@@ -19,6 +30,7 @@ class KaleidoscopeCombinedCLI(cli.Application, PatternPlayerMixin):
 		k.addGenerator(movingLine, 50, {"speed": 3, "thickness": 2, "max_wave_amp": 100})
 		k.addGenerator(morphingTriangle, 80, {"speed": 1})
 		k.addGenerator(morphingCircle, 5)
+		k.addGenerator(snake, 100, {"length": 50, "width": 10})
 		self.main_from_renderer(lambda writer: kaleidoscope_renderer(writer, k))
 
 @PatternPlayer.subcommand("kaleidoscope-triangles")
@@ -71,8 +83,49 @@ class KaleidoscopeCLI(cli.Application, PatternPlayerMixin):
 		k.addGenerator(movingLine, 20, {"speed": 3, "thickness": 2, "max_wave_amp": 100})
 		self.main_from_renderer(lambda writer: kaleidoscope_renderer(writer, k))
 
+@PatternPlayer.subcommand("kaleidoscope-snake")
+class KaleidoscopeSnakeCLI(cli.Application, PatternPlayerMixin):
+	"""
+	"""
+	def main(self):
+		k = Kaleidoscope(window_size = 20, rotate = 0)
+		k.addGenerator(snake, 100, {"length": 50, "width": 10})
+		self.main_from_renderer(lambda writer: kaleidoscope_renderer(writer, k))
+
 def rotate_screen(screen, x):
 	return np.concatenate([screen[x:, : , :], screen[:x, :, :]])
+
+class snake():
+	def __init__(self, shape, length, width):
+		self.q = collections.deque([(0, 0)] * length)
+		self.colour = map(int, np.random.random(3) * 255)
+		self.shape = shape
+		self.width = width
+		self.t = 0
+		self.s = 0
+	def draw(self, screen):
+		#print self.q
+		for x in self.q:
+			screen[x[1]][x[0]] = self.colour
+	def move(self):
+		self.q.popleft()	
+		if len(self.q) == 0:
+			return
+		if self.t % (4 * self.width) < 10:
+			(r, c) = np.array(self.q[-1]) + (0, 1)
+		elif self.t % (4 * self.width) < 20:
+			(r, c) = np.array(self.q[-1]) + (1, 0)
+		elif self.t % (4 * self.width) < 30:
+			(r, c) = np.array(self.q[-1]) + (0, -1)
+		else:
+			(r, c) = np.array(self.q[-1]) + (1, 0)
+		if r < Screen.screen_max_magnitude:
+			self.q.append((r, c))
+		#print self.t, self.q
+		self.t += 1
+	def keep(self):
+		return len(self.q) > 0
+		
 
 class movingLine():
 	def __init__(self, shape, speed, max_wave_amp, thickness):
@@ -131,6 +184,25 @@ class morphingCircle():
 	
 	def keep(self):
 		return (self.p < self.shape[0]).any()
+
+class fallingSquare():
+	def __init__(self, shape):
+		self.p = np.array([0, np.random.random()*shape[0]])
+		self.speed = np.random.random()*3 + 2
+		self.colour = map(int, np.random.random(3) * 255)
+		self.shape = shape
+		self.width = int(np.random.random()*10 + 5)
+
+	def draw(self, screen):
+		(rows, cols) = screen.shape[:2]
+		print self.p
+		cv2.rectangle(screen, tuple(map(int, self.p)), tuple(map(int, self.p + [10, 10])), self.colour, -1)
+
+	def move(self):
+		self.p[0] += self.speed
+	
+	def keep(self):
+		return True #(self.p[0] < self.shape[1])
 
 class Kaleidoscope():
 	def __init__(self, window_size, rotate):

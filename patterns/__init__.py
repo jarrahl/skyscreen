@@ -21,3 +21,4 @@ import test_patterns
 import text
 import theano_examples
 import video
+import text2

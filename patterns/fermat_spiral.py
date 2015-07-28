@@ -30,17 +30,19 @@ def spiral_renderer(writer):
 
 		count = 0
 		a = 1.5
-		rotation_amount = 2
+		rotation_amount = 4
 		while True:
 			screen = np.zeros((Screen.screen_vane_count, Screen.screen_max_magnitude, 3))
-			a = (math.sin(count/30.0)/2 + 0.5) * 8 + 5
+			#a = (math.sin(count/30.0)/2 + 0.5) * 8 + 5
+			a = 13
+			print a
 			max_angle = int((Screen.screen_max_magnitude/a)**2)
 			for theta in xrange(1, max_angle):
 				r1 = a * math.sqrt(theta)
 				if int(r1) < Screen.screen_max_magnitude:
 					screen[theta % 360][-int(r1):-int(r1-3)] = np.array(colorsys.hsv_to_rgb(((theta + count) % 100) / 100.0, 1, 1)) * 255
 					screen[(theta + 180) % 360][-int(r1):-int(r1-3)] = screen[theta % 360][-int(r1)]
-			writer_buf_reshaped[:,:,:] = screen #rotate(screen, int(count * rotation_amount) % Screen.screen_vane_count)
+			writer_buf_reshaped[:,:,:] = rotate(screen, int(count * rotation_amount) % Screen.screen_vane_count)
 			writer.frame_ready()
 			count += 1
 
