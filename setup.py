@@ -16,27 +16,30 @@ setup(name='Skyscreen',
       ],
       setup_requires=[
             'cython',
-            'numpy'
+            'numpy',
+            'pyserial'
       ],
       install_requires=[
             'numpy',
             'scipy',
-            'Sphinx',
+            'sphinx',
             'sphinx-autobuild',
             'theano',
-            'Cython==0.21.2',
+            #'Cython==0.21.2',
             'nose',
             'noise',
             'pyzmq',
             'plumbum',
             'scales',
             'pyyaml',
+            'msgpack-python',
+            'pyserial'
       ],
-      include_dirs = [
+      include_dirs=[
             numpy.get_include()
       ],
       ext_modules=cythonize([
             "pyrendering/fast_tools.pyx",
             "skyscreen_tools/flatspace_tools.pyx"
       ])
-)
+      )

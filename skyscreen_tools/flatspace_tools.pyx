@@ -27,8 +27,9 @@ mags = skyscreen_tools.flatspace_const.mags
 angles = skyscreen_tools.flatspace_const.angles
 
 @cython.boundscheck(False)
-def blit(np.ndarray[np.uint8_t, ndim = 3] input,
-		 np.ndarray[np.uint8_t, ndim = 3] output):
+def blit_polar(
+		np.ndarray[np.uint8_t, ndim = 3] input,
+		np.ndarray[np.uint8_t, ndim = 3] output):
 	cdef int r, g, b
 	cdef int row, col
 	cdef int mag, angle
@@ -37,6 +38,28 @@ def blit(np.ndarray[np.uint8_t, ndim = 3] input,
 		for col in xrange(paintable_area):
 			mag = mags[row, col]
 			angle = angles[row, col]
+			if 0 <= mag < total_mag and 0 <= angle < total_angles:
+				r = input[row, col, 0]
+				g = input[row, col, 1]
+				b = input[row, col, 2]
+				output[angle, mag, 0] = r
+				output[angle, mag, 1] = g
+				output[angle, mag, 2] = b
+
+@cython.boundscheck(True)
+def blit_mapping(
+		np.ndarray[np.uint8_t, ndim = 3] input,
+	 	np.ndarray[np.uint8_t, ndim = 3] output,
+		np.ndarray[np.int32_t, ndim = 2] mag_map,
+		np.ndarray[np.int32_t, ndim = 2] angle_map):
+	cdef int r, g, b
+	cdef int row, col
+	cdef int mag, angle
+	global mags, angles
+	for row in xrange(paintable_area):
+		for col in xrange(paintable_area):
+			mag = mag_map[row, col]
+			angle = angle_map[row, col]
 			if 0 <= mag < total_mag and 0 <= angle < total_angles:
 				r = input[row, col, 0]
 				g = input[row, col, 1]

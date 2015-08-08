@@ -40,7 +40,7 @@ void free_frame(Frame f) {
     free(f);
 }
 
-Server new_server() {
+Server new_server(bool fast_mode) {
     Server s = (ServerS *)calloc(1, sizeof(ServerS));
     assert(s != NULL);
     s->output_frame = new_frame();
@@ -48,6 +48,9 @@ Server new_server() {
     s->next_frame = new_frame();
     s->max_nextframes = 2;
     s->max_ignores = 2;
+    if (pthread_mutex_init(&(s->frame_lock), NULL) != 0) 
+        die(__LINE__, "Could not allocate frame lock");
+    s->fast_mode = fast_mode;
 
     return s;
 }
@@ -56,6 +59,10 @@ void free_server(Server s) {
     free_frame(s->output_frame);
     free_frame(s->current_frame);
     free_frame(s->next_frame);
+    if (pthread_mutex_trylock(&(s->frame_lock)))
+        die(__LINE__, "Could not lock frame lock for safe deallocation");
+    pthread_mutex_unlock(&(s->frame_lock));
+    pthread_mutex_destroy(&(s->frame_lock));
     free(s);
 }
 
@@ -91,7 +98,7 @@ void terminate_server(Server s) {
 
 typedef std::map<std::string, msgpack::object> MapStrMsgPackObj;
 
-void receive_frame(Server s) {
+void receive_frames(Server s) {
     assert(s->sockfd);
 
     while (1) {
@@ -104,9 +111,23 @@ void receive_frame(Server s) {
     }
 }
 
+inline void switch_frame(Server s) {
+    pthread_mutex_lock(&(s->frame_lock));
+    Frame tmp_frame;
+    if (s->fast_mode) {
+	tmp_frame = s->output_frame;
+        s->output_frame = s->current_frame;
+	s->current_frame = s->next_frame;
+	s->next_frame = tmp_frame;
+    } else {
+        memcpy(s->output_frame, s->current_frame, FRAME_SIZE);
+    }
+    pthread_mutex_unlock(&(s->frame_lock));
+}
+
 void increment_frame(Server s) {
     s->state_vec++;
-    memcpy(s->output_frame, s->current_frame, FRAME_SIZE);
+    switch_frame(s);
     Frame tmp = s->next_frame;
     s->next_frame = s->current_frame;
     s->current_frame = tmp;
@@ -189,19 +210,33 @@ void process_message(Server s,
                 if (is_eof){
                     update_frame(s->current_frame, mmap);
                 }
-                memcpy(s->output_frame, s->current_frame, FRAME_SIZE);
+		switch_frame(s);
             }
         }
     }
 }
 
+Frame frame_pause(Server s) {
+    pthread_mutex_unlock(&s->frame_lock);
+    // In here we potentially let the server
+    // thread take over and write a frame
+    pthread_mutex_lock(&s->frame_lock);
+    return s->output_frame;
+}
+Frame first_frame(Server s) {
+    pthread_mutex_lock(&s->frame_lock);
+    return s->output_frame;
+}
+void last_frame(Server s) {
+    pthread_mutex_unlock(&s->frame_lock);
+}
 
 int main() {
-    Server s = new_server();
+    Server s = new_server(0);
     std::string port = "5555";
     initalize_server(s, port.c_str());
 
-    receive_frame(s);
+    receive_frames(s);
     terminate_server(s);
     free_server(s);
 }

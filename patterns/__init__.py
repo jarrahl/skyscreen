@@ -18,8 +18,9 @@ import pygamerender
 import sinwaves
 import stars
 import test_patterns
-import text
 import theano_examples
 import video
 import perlin
 import wireframe_cube
+import text
+import muse
