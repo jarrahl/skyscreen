@@ -13,7 +13,7 @@ import fractal
 import fsm
 import kaleidoscope
 import lewis
-import noise
+import noise_pattern
 import pygamerender
 import sinwaves
 import stars
@@ -21,4 +21,5 @@ import test_patterns
 import text
 import theano_examples
 import video
-import text2
+import perlin
+import wireframe_cube

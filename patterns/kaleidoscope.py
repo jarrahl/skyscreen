@@ -10,6 +10,16 @@ from skyscreen_core.interface import Screen, pixel_vane_mapping
 import plumbum.cli as cli
 from patterns.cli import PatternPlayer, PatternPlayerMixin
 
+@PatternPlayer.subcommand("kaleidoscope-circles")
+class KaleidoscopeCirclesCLI(cli.Application, PatternPlayerMixin):
+	"""
+	aosnethu
+	"""
+	def main(self):
+		k = Kaleidoscope(window_size = 20, rotate = -1)
+		k.addGenerator(risingCircle, 20)
+		self.main_from_renderer(lambda writer: kaleidoscope_renderer(writer, k))
+
 @PatternPlayer.subcommand("kaleidoscope-squares")
 class KaleidoscopeSquaresCLI(cli.Application, PatternPlayerMixin):
 	"""
@@ -43,8 +53,8 @@ class KaleidoscopeTrianglesCLI(cli.Application, PatternPlayerMixin):
 		k.addGenerator(morphingTriangle, 20, {"speed": 1})
 		self.main_from_renderer(lambda writer: kaleidoscope_renderer(writer, k))
 
-@PatternPlayer.subcommand("kaleidoscope-circles")
-class KaleidoscopeCirclesCLI(cli.Application, PatternPlayerMixin):
+@PatternPlayer.subcommand("kaleidoscope-bubbles")
+class KaleidoscopeBubblesCLI(cli.Application, PatternPlayerMixin):
 	"""
 	Kaleidoscope with random circles.
 	"""
@@ -184,6 +194,26 @@ class morphingCircle():
 	
 	def keep(self):
 		return (self.p < self.shape[0]).any()
+
+class risingCircle():
+	def __init__(self, shape):
+		self.p = np.array([shape[1]-1, np.random.random()*shape[0]])
+		self.speed = np.random.random()*2 + 0.5
+		self.decay = 0.98
+		self.colour = np.random.random(3) * 255
+		self.shape = shape
+		self.radius = int(np.random.random()*10 + 5)
+
+	def draw(self, screen):
+		(rows, cols) = screen.shape[:2]
+		cv2.circle(screen, tuple(map(int, self.p)), self.radius, map(int, self.colour), -1)
+
+	def move(self):
+		self.p[0] -= self.speed
+		self.colour *= self.decay
+	
+	def keep(self):
+		return (self.p[0] + self.radius > 0)
 
 class fallingSquare():
 	def __init__(self, shape):
