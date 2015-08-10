@@ -13,6 +13,25 @@ R = Screen.screen_max_magnitude
 C = Screen.screen_vane_count
 count = 0
 
+def bloom(x):
+	m = (np.array([5, 3, 2]) * x) % 1.0
+	m = m*m*m
+	return m * 256
+
+def bluegreen(x):
+	m = [0.682, 0.193, 0.711]
+	return [256*(x % a) / a for a in m]
+
+def cytoplasm(x):
+	m = [0.1234, 0.4231, 0.6193]
+	return [256*(x % a) / a for a in m]
+
+def persian(x):
+	if x % 0.1 < 0.05:
+		return [255]*3
+	else:
+		return [0]*3
+
 def supernova(x):
 	# x is in [-1,1]
 	return np.array(colorsys.hsv_to_rgb(x, 1, 1)) * 255
@@ -60,6 +79,31 @@ def pinksky(x):
 		return [0,0,255]
 	return [0,0,(0.8 - x) * 255]
 
+@PatternPlayer.subcommand("perlin-kaleido-bloom")
+class PerlinKaleidoBloomCLI(cli.Application, PatternPlayerMixin):
+	"""
+	"""
+	def main(self):
+		self.main_from_renderer(partial(perlin_kaleido_gen, pane_size = 30, colour = bloom, r = 1, iterations = 5, rotate = 0.2, speed = 2))
+
+@PatternPlayer.subcommand("perlin-kaleido-bottles")
+class PerlinKaleidoBottlesCLI(cli.Application, PatternPlayerMixin):
+	"""
+	"""
+	def main(self):
+		self.main_from_renderer(partial(perlin_kaleido_gen, pane_size = 5, colour = bluegreen, r = 1, iterations = 5, rotate = 0.2, speed = 2))
+@PatternPlayer.subcommand("perlin-kaleido-cytoplasm")
+class PerlinKaleidoCytoplasmCLI(cli.Application, PatternPlayerMixin):
+	"""
+	"""
+	def main(self):
+		self.main_from_renderer(partial(perlin_kaleido_gen, pane_size = 20, colour = cytoplasm, r = 1, iterations = 5, rotate = -0.2, speed = 2))
+@PatternPlayer.subcommand("perlin-kaleido-persian")
+class PerlinKaleidoPersianCLI(cli.Application, PatternPlayerMixin):
+	"""
+	"""
+	def main(self):
+		self.main_from_renderer(partial(perlin_kaleido_gen, pane_size = 20, colour = persian, r = 1, iterations = 5, rotate = -0.1, speed = 2))
 @PatternPlayer.subcommand("perlin-kaleido-pinksky")
 class PerlinKaleidoPinkskyCLI(cli.Application, PatternPlayerMixin):
 	"""
@@ -85,6 +129,18 @@ class PerlinKaleidoSpaceribbonsCLI(cli.Application, PatternPlayerMixin):
 	def main(self):
 		self.main_from_renderer(partial(perlin_kaleido_gen, pane_size = 20, colour = spaceribbons, r = 1, iterations = 5, rotate = 0, speed = 2))
 
+@PatternPlayer.subcommand("perlin-cytoplasm")
+class PerlinCytoplasmCLI(cli.Application, PatternPlayerMixin):
+	"""
+	"""
+	def main(self):
+		self.main_from_renderer(partial(perlin_gen, colour = cytoplasm, r = 1, iterations = 5, rotate = -0.2, speed = 2))
+@PatternPlayer.subcommand("perlin-persian")
+class PerlinPersianCLI(cli.Application, PatternPlayerMixin):
+	"""
+	"""
+	def main(self):
+		self.main_from_renderer(partial(perlin_gen, colour = persian, r = 1, iterations = 5, rotate = -0.1, speed = 2))
 @PatternPlayer.subcommand("perlin-pinksky")
 class PerlinPinkskyCLI(cli.Application, PatternPlayerMixin):
 	"""
@@ -134,7 +190,6 @@ def perlin_gen(writer, colour, r = 1.0, iterations = 5, rotate = 1, speed = 1):
 		screen = np.zeros((Screen.screen_vane_count, Screen.screen_max_magnitude, 3))
 		writer_buf_reshaped = writer_buf.reshape((Screen.screen_vane_count, Screen.screen_max_magnitude, 3))
 
-		N = 5
 		screen = np.zeros(writer_buf_reshaped.shape)
 		for y in xrange(R):
 			for x in xrange(C):
@@ -161,7 +216,6 @@ def perlin_kaleido_gen(writer, colour, pane_size = 20, r = 1.0, iterations = 5, 
 	num_windows = 360 / pane_size / 2
 	with writer as writer_buf:
 		writer_buf_reshaped = writer_buf.reshape((Screen.screen_vane_count, Screen.screen_max_magnitude, 3))
-		N = 5
 		screen = np.zeros((pane_size, Screen.screen_max_magnitude, 3))
 		for y in xrange(R):
 			for x in xrange(pane_size):

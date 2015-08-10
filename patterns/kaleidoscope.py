@@ -37,10 +37,10 @@ class KaleidoscopeCombinedCLI(cli.Application, PatternPlayerMixin):
 	"""
 	def main(self):
 		k = Kaleidoscope(window_size = 20, rotate = -1)
-		k.addGenerator(movingLine, 50, {"speed": 3, "thickness": 2, "max_wave_amp": 100})
+		k.addGenerator(movingLine, 50, {"speed": 2, "thickness": 1, "max_wave_amp": 100})
 		k.addGenerator(morphingTriangle, 80, {"speed": 1})
-		k.addGenerator(morphingCircle, 5)
-		k.addGenerator(snake, 100, {"length": 50, "width": 10})
+		k.addGenerator(morphingCircle, 20)
+		k.addGenerator(snake, 80, {"length": 50, "width": 9, "speed": 3, "x": 2})
 		self.main_from_renderer(lambda writer: kaleidoscope_renderer(writer, k))
 
 @PatternPlayer.subcommand("kaleidoscope-triangles")
@@ -70,7 +70,7 @@ class KaleidoscopeFastLinesCLI(cli.Application, PatternPlayerMixin):
 	"""
 	def main(self):
 		k = Kaleidoscope(window_size = 10, rotate = 0.5)
-		k.addGenerator(movingLine, 10, {"speed": 4, "thickness": 1, "max_wave_amp": 100})
+		k.addGenerator(movingLine, 10, {"speed": 4, "thickness": 2, "max_wave_amp": 100})
 		self.main_from_renderer(lambda writer: kaleidoscope_renderer(writer, k))
 
 @PatternPlayer.subcommand("kaleidoscope-superfast")
@@ -99,18 +99,20 @@ class KaleidoscopeSnakeCLI(cli.Application, PatternPlayerMixin):
 	"""
 	def main(self):
 		k = Kaleidoscope(window_size = 20, rotate = 0)
-		k.addGenerator(snake, 100, {"length": 50, "width": 10})
+		k.addGenerator(snake, 80, {"length": 50, "width": 9, "speed": 3, "x": 2})
+		k.addGenerator(snake, 160, {"length": 100, "width": 18, "speed": 1})
 		self.main_from_renderer(lambda writer: kaleidoscope_renderer(writer, k))
 
 def rotate_screen(screen, x):
 	return np.concatenate([screen[x:, : , :], screen[:x, :, :]])
 
 class snake():
-	def __init__(self, shape, length, width):
-		self.q = collections.deque([(0, 0)] * length)
+	def __init__(self, shape, length, width, speed = 1, x = 0):
+		self.q = collections.deque([(x, 0)] * length)
 		self.colour = map(int, np.random.random(3) * 255)
 		self.shape = shape
 		self.width = width
+		self.speed = speed
 		self.t = 0
 		self.s = 0
 	def draw(self, screen):
@@ -118,24 +120,23 @@ class snake():
 		for x in self.q:
 			screen[x[1]][x[0]] = self.colour
 	def move(self):
-		self.q.popleft()	
-		if len(self.q) == 0:
-			return
-		if self.t % (4 * self.width) < 10:
-			(r, c) = np.array(self.q[-1]) + (0, 1)
-		elif self.t % (4 * self.width) < 20:
-			(r, c) = np.array(self.q[-1]) + (1, 0)
-		elif self.t % (4 * self.width) < 30:
-			(r, c) = np.array(self.q[-1]) + (0, -1)
-		else:
-			(r, c) = np.array(self.q[-1]) + (1, 0)
-		if r < Screen.screen_max_magnitude:
-			self.q.append((r, c))
-		#print self.t, self.q
-		self.t += 1
+		for x in xrange(self.speed):
+			self.q.popleft()	
+			if len(self.q) == 0:
+				return
+			if self.t % (4 * self.width) < self.width:
+				(r, c) = np.array(self.q[-1]) + (0, 1)
+			elif self.t % (4 * self.width) < 2*self.width:
+				(r, c) = np.array(self.q[-1]) + (1, 0)
+			elif self.t % (4 * self.width) < 3*self.width:
+				(r, c) = np.array(self.q[-1]) + (0, -1)
+			else:
+				(r, c) = np.array(self.q[-1]) + (1, 0)
+			if r < Screen.screen_max_magnitude:
+				self.q.append((r, c))
+			self.t += 1
 	def keep(self):
 		return len(self.q) > 0
-		
 
 class movingLine():
 	def __init__(self, shape, speed, max_wave_amp, thickness):

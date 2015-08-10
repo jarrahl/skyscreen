@@ -23,4 +23,5 @@ import video
 import perlin
 import wireframe_cube
 import text
-import muse
+import gradients
+import combine
