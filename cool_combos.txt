@@ -26,3 +26,6 @@ combine perlin-kaleido-pinksky and perlin-kaleido-supernova
 combine text and gradients-fast
 combine npnoise and gradients-fast
 combine npnoise and perlin-spaceclouds
+combine pokemon mask gradients-fast
+combine pokemon or stars
+combine perlin-kaleido-spaceclouds behind pokemon

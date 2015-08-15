@@ -32,6 +32,12 @@ def persian(x):
 	else:
 		return [0]*3
 
+def rorshac(x):
+	if x < 0.02:
+		return [255]*3
+	else:
+		return [0]*3
+
 def supernova(x):
 	# x is in [-1,1]
 	return np.array(colorsys.hsv_to_rgb(x, 1, 1)) * 255
@@ -78,6 +84,20 @@ def pinksky(x):
 	if x < 0.2:
 		return [0,0,255]
 	return [0,0,(0.8 - x) * 255]
+
+@PatternPlayer.subcommand("perlin-rorshac")
+class PerlinKaleidoRorshacCLI(cli.Application, PatternPlayerMixin):
+	"""
+	"""
+	def main(self):
+		self.main_from_renderer(partial(perlin_kaleido_gen, pane_size = 180, colour = rorshac, r = 1, iterations = 5, rotate = 0.2, speed = 1))
+
+@PatternPlayer.subcommand("perlin-rorshac-bloom")
+class PerlinKaleidoRorshacBloomCLI(cli.Application, PatternPlayerMixin):
+	"""
+	"""
+	def main(self):
+		self.main_from_renderer(partial(perlin_kaleido_gen, pane_size = 180, colour = bloom, r = 1, iterations = 5, rotate = 0, speed = 1))
 
 @PatternPlayer.subcommand("perlin-kaleido-bloom")
 class PerlinKaleidoBloomCLI(cli.Application, PatternPlayerMixin):

@@ -49,7 +49,7 @@ class GradientsFastCLI(cli.Application, PatternPlayerMixin):
 		self.main_from_renderer(partial(gradients, period = 30, speed = 5))
 
 @PatternPlayer.subcommand("gradients")
-class GradientsFastCLI(cli.Application, PatternPlayerMixin):
+class GradientsCLI(cli.Application, PatternPlayerMixin):
 	"""
 	Create linear gradients with provided parameters.
 	"""

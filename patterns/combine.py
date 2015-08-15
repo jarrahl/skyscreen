@@ -1,4 +1,5 @@
 import logging
+import cv2
 import numpy as np
 import shlex
 import tempfile
@@ -8,6 +9,7 @@ import subprocess
 import sys
 import signal
 from patterns.cli import PatternPlayer, PatternPlayerMixin
+from skyscreen_core.interface import Screen
 import skyscreen_core.interface
 import skyscreen_core.memmap_interface
 import atexit
@@ -15,6 +17,14 @@ import atexit
 # TODO: Fix this
 left_port = int(np.random.random()*1000) + 5000
 right_port = int(np.random.random()*1000) + 5000
+
+def masked_overlay(x_flat, y_flat):
+	# overlay x onto y
+	x = x_flat.reshape((Screen.screen_vane_count, Screen.screen_max_magnitude, 3))
+	y = y_flat.reshape((Screen.screen_vane_count, Screen.screen_max_magnitude, 3))
+	gray = cv2.cvtColor(x, cv2.COLOR_RGB2GRAY) 
+	retval, mask = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV)
+	return cv2.bitwise_or(y, y, mask=mask).flatten() | x_flat
 
 combine_funcs = {
 "behind": lambda x, y: np.fmax(x * 0.3, y),
@@ -25,6 +35,7 @@ combine_funcs = {
 "max": lambda x, y: np.fmax(x, y),
 "sum": lambda x, y: (x + y) % 256,
 "diff": lambda x, y: (x - y + 256) % 256,
+"mask": masked_overlay,
 }
 
 @PatternPlayer.subcommand("combine")

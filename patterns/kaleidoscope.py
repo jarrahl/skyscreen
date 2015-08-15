@@ -10,6 +10,30 @@ from skyscreen_core.interface import Screen, pixel_vane_mapping
 import plumbum.cli as cli
 from patterns.cli import PatternPlayer, PatternPlayerMixin
 
+@PatternPlayer.subcommand("kaleidoscope-pokemon")
+class KaleidoscopePokemonCLI(cli.Application, PatternPlayerMixin):
+	"""
+	aosnethu
+	"""
+	def loadPokemons():
+		path = "data/pokemon/"
+		print "Loading pokemons for kaleidoscope-pokemon"
+		pokemons = []
+		for x in xrange(1, 151):
+			img = cv2.imread(path + str(x) + ".png")
+		#	img[np.all(img == [0,0,0], axis=2)] = [10]*3	
+			img = np.pad(img, ((1, 1), (1, 1), (0, 0)), 'constant', constant_values=255)
+			mask = np.zeros((img.shape[0] + 2, img.shape[1] + 2), dtype=np.uint8)
+			cv2.floodFill(img, mask, (0, 0), 0)
+			pokemons.append(cv2.resize(img, (50, 50)))
+		print "Loaded pokemons for kaleidoscope-pokemon"
+		return pokemons
+	pokemons = loadPokemons()
+	def main(self):
+		k = Kaleidoscope(window_size = 60, rotate = -1)
+		k.addGenerator(risingPokemon, 100)
+		self.main_from_renderer(lambda writer: kaleidoscope_renderer(writer, k))
+
 @PatternPlayer.subcommand("kaleidoscope-circles")
 class KaleidoscopeCirclesCLI(cli.Application, PatternPlayerMixin):
 	"""
@@ -116,7 +140,6 @@ class snake():
 		self.t = 0
 		self.s = 0
 	def draw(self, screen):
-		#print self.q
 		for x in self.q:
 			screen[x[1]][x[0]] = self.colour
 	def move(self):
@@ -196,6 +219,25 @@ class morphingCircle():
 	def keep(self):
 		return (self.p < self.shape[0]).any()
 
+def overlay(base, img, x, y):
+	(W, H) = base.shape[:2]
+	(w, h) = img.shape[:2]
+	h = min(h, H-y)
+	base[x:(x+w), y:(y+h), :] = img[:w, :h]
+
+class risingPokemon():
+	def __init__(self, shape):
+		self.img = np.random.randint(0, 151) #np.random.choice(KaleidoscopePokemonCLI.pokemons)
+		#self.p = np.array([shape[1]-1, np.random.random()*shape[0]])
+		self.p = [0, 230]
+		self.speed = 2
+	def draw(self, screen):
+		overlay(screen, KaleidoscopePokemonCLI.pokemons[self.img], self.p[0], self.p[1])
+	def move(self):
+		self.p[1] -= self.speed
+	def keep(self):
+		return self.p[1] >= 0
+
 class risingCircle():
 	def __init__(self, shape):
 		self.p = np.array([shape[1]-1, np.random.random()*shape[0]])
@@ -226,7 +268,6 @@ class fallingSquare():
 
 	def draw(self, screen):
 		(rows, cols) = screen.shape[:2]
-		print self.p
 		cv2.rectangle(screen, tuple(map(int, self.p)), tuple(map(int, self.p + [10, 10])), self.colour, -1)
 
 	def move(self):
